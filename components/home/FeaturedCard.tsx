@@ -1,4 +1,6 @@
+import Link from "next/link";
 import Icon from "@/components/ui/Icon";
+import SaveButton from "@/components/home/SaveButton";
 import { formatPrice, type Property } from "@/types/property";
 
 interface FeaturedCardProps {
@@ -7,7 +9,10 @@ interface FeaturedCardProps {
 
 export default function FeaturedCard({ property }: FeaturedCardProps) {
   return (
-    <div className="group relative cursor-pointer overflow-hidden rounded-xl bg-white shadow-soft dark:bg-white/5">
+    <Link
+      href={`/property/${property.slug}`}
+      className="group relative block cursor-pointer overflow-hidden rounded-xl bg-white shadow-soft dark:bg-white/5"
+    >
       <div className="relative aspect-[4/3] w-full overflow-hidden">
         <img
           alt={property.imageAlt}
@@ -19,12 +24,7 @@ export default function FeaturedCard({ property }: FeaturedCardProps) {
             {property.tag}
           </div>
         )}
-        <button
-          aria-label="Save property"
-          className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-nordic backdrop-blur-sm transition-all hover:bg-mosque hover:text-white dark:bg-black/60 dark:text-white"
-        >
-          <Icon name="heart" className="h-5 w-5" />
-        </button>
+        <SaveButton className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-nordic backdrop-blur-sm transition-all hover:bg-mosque hover:text-white dark:bg-black/60 dark:text-white" />
         {property.id === "glass-pavilion" && (
           <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent opacity-60" />
         )}
@@ -56,6 +56,6 @@ export default function FeaturedCard({ property }: FeaturedCardProps) {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

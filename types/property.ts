@@ -2,8 +2,23 @@ export type PropertyType = "House" | "Apartment" | "Villa" | "Penthouse";
 
 export type PropertyStatus = "sale" | "rent";
 
+export interface PropertyAgent {
+  name: string;
+  photo: string;
+  rating: string;
+  phone: string;
+  whatsapp: string;
+}
+
+export interface PropertyCoordinates {
+  lat: number;
+  lng: number;
+}
+
 export interface Property {
   id: string;
+  /** URL amigable y única, ej. "glass-pavilion-beverly-hills" */
+  slug: string;
   title: string;
   location: string;
   address: string;
@@ -14,9 +29,19 @@ export interface Property {
   beds: number;
   baths: number;
   area: number;
+  garage: number;
+  /** Compatibilidad: siempre equivale a `images[0]` */
   image: string;
+  /** Compatibilidad: siempre equivale a `imagesAlt[0]` */
   imageAlt: string;
-  tag?: "Exclusive" | "New Arrival";
+  /** Colección de 1 a N imágenes de la propiedad */
+  images: string[];
+  imagesAlt: string[];
+  description: string;
+  amenities: string[];
+  agent: PropertyAgent;
+  coordinates: PropertyCoordinates;
+  tag?: "Exclusive" | "New Arrival" | "Premium" | "New";
   featured?: boolean;
 }
 

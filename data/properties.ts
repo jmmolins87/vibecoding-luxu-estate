@@ -1,8 +1,21 @@
-import type { Property } from "@/types/property";
+import type { Property, PropertyAgent } from "@/types/property";
+
+const defaultAgent: PropertyAgent = {
+  name: "Sarah Jenkins",
+  photo:
+    "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80",
+  rating: "Top Rated Agent",
+  phone: "+13105550142",
+  whatsapp: "https://wa.me/13105550142",
+};
+
+const img = (id: string, w = 1200) =>
+  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
 
 export const featuredProperties: Property[] = [
   {
     id: "glass-pavilion",
+    slug: "glass-pavilion-beverly-hills",
     title: "The Glass Pavilion",
     location: "Beverly Hills, California",
     address: "1201 Laurel Way, Beverly Hills",
@@ -12,14 +25,40 @@ export const featuredProperties: Property[] = [
     beds: 5,
     baths: 4.5,
     area: 4200,
+    garage: 3,
     image:
       "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80",
     imageAlt: "Luxury modern villa exterior with pool",
+    images: [
+      "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80",
+      img("photo-1600607687939-ce8a6c25118c"),
+      img("photo-1600585152220-90363fe7e115"),
+      img("photo-1595526114035-0d45ed16cfbf"),
+    ],
+    imagesAlt: [
+      "Luxury modern villa exterior with pool",
+      "Open plan living room with floor-to-ceiling glass",
+      "Designer kitchen with island",
+      "Primary suite with garden view",
+    ],
+    description:
+      "Experience modern luxury in this architecturally stunning glass pavilion in the heart of Beverly Hills. Floor-to-ceiling glass walls flood the interiors with natural light and open onto resort-style outdoor living with pool, spa and guest house.",
+    amenities: [
+      "Swimming Pool",
+      "Smart Home System",
+      "Private Gym",
+      "Wine Cellar",
+      "Central Heating & Cooling",
+      "Electric Vehicle Charging",
+    ],
+    agent: defaultAgent,
+    coordinates: { lat: 34.0736, lng: -118.4004 },
     tag: "Exclusive",
     featured: true,
   },
   {
     id: "azure-heights",
+    slug: "azure-heights-penthouse-vancouver",
     title: "Azure Heights Penthouse",
     location: "Downtown, Vancouver",
     address: "889 Pacific St, Vancouver",
@@ -29,9 +68,34 @@ export const featuredProperties: Property[] = [
     beds: 3,
     baths: 3,
     area: 2100,
+    garage: 2,
     image:
       "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80",
     imageAlt: "Modern interior living room with view",
+    images: [
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80",
+      img("photo-1600607687920-4e2a09cf159d"),
+      img("photo-1616486338812-3dadae4b4ace"),
+      img("photo-1556912167-f556f1f39fdf"),
+    ],
+    imagesAlt: [
+      "Modern interior living room with view",
+      "Lounge with panoramic city views",
+      "Dining area with designer lighting",
+      "Chef's kitchen with marble finishes",
+    ],
+    description:
+      "Perched above downtown Vancouver, this penthouse pairs skyline views with refined interiors. An open living plan, wraparound terrace and private elevator lobby make it the city's most coveted address.",
+    amenities: [
+      "Rooftop Terrace",
+      "Concierge Service",
+      "Private Gym",
+      "Smart Home System",
+      "Wine Cellar",
+      "Electric Vehicle Charging",
+    ],
+    agent: defaultAgent,
+    coordinates: { lat: 49.2827, lng: -123.1207 },
     tag: "New Arrival",
     featured: true,
   },
@@ -40,6 +104,7 @@ export const featuredProperties: Property[] = [
 export const newInMarketProperties: Property[] = [
   {
     id: "modern-family-home",
+    slug: "modern-family-home-seattle",
     title: "Modern Family Home",
     location: "Seattle",
     address: "123 Pine St, Seattle",
@@ -49,12 +114,36 @@ export const newInMarketProperties: Property[] = [
     beds: 3,
     baths: 2,
     area: 120,
+    garage: 1,
     image:
       "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=80",
     imageAlt: "Modern white house facade",
+    images: [
+      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=80",
+      img("photo-1600585154526-990dced4db0d"),
+      img("photo-1484154218962-a197022b5858"),
+      img("photo-1595526114035-0d45ed16cfbf"),
+    ],
+    imagesAlt: [
+      "Modern white house facade",
+      "Kitchen and living space",
+      "Bright family living room",
+      "Bedroom with natural light",
+    ],
+    description:
+      "A light-filled family home minutes from downtown Seattle. Updated kitchen, flexible living spaces and a low-maintenance garden make it ideal for modern family life.",
+    amenities: [
+      "Central Heating & Cooling",
+      "Garden",
+      "Smart Home System",
+      "Laundry Room",
+    ],
+    agent: defaultAgent,
+    coordinates: { lat: 47.6062, lng: -122.3321 },
   },
   {
     id: "urban-loft",
+    slug: "urban-loft-portland",
     title: "Urban Loft",
     location: "Portland",
     address: "456 Elm Ave, Portland",
@@ -65,12 +154,29 @@ export const newInMarketProperties: Property[] = [
     beds: 1,
     baths: 1,
     area: 85,
+    garage: 1,
     image:
       "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80",
     imageAlt: "Stylish apartment living room",
+    images: [
+      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80",
+      img("photo-1502672260266-1c1ef2d93688"),
+      img("photo-1556912167-f556f1f39fdf"),
+    ],
+    imagesAlt: [
+      "Stylish apartment living room",
+      "Loft bedroom with large windows",
+      "Compact modern kitchen",
+    ],
+    description:
+      "Industrial-chic loft in Portland's arts district with exposed brick, high ceilings and oversized windows. Walk to galleries, cafés and transit.",
+    amenities: ["High Ceilings", "In-unit Laundry", "Bike Storage", "Pet Friendly"],
+    agent: defaultAgent,
+    coordinates: { lat: 45.5152, lng: -122.6784 },
   },
   {
     id: "highland-retreat",
+    slug: "highland-retreat-bend",
     title: "Highland Retreat",
     location: "Bend",
     address: "789 Mountain Rd, Bend",
@@ -80,12 +186,29 @@ export const newInMarketProperties: Property[] = [
     beds: 2,
     baths: 2,
     area: 98,
+    garage: 1,
     image:
       "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=800&q=80",
     imageAlt: "Cabin in the woods exterior",
+    images: [
+      "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=800&q=80",
+      img("photo-1600210492486-724fe5c67fb0"),
+      img("photo-1615873968403-89e068629265"),
+    ],
+    imagesAlt: [
+      "Cabin in the woods exterior",
+      "Cozy wood-paneled living room",
+      "Rustic dining corner",
+    ],
+    description:
+      "A serene mountain retreat surrounded by pines. Vaulted cedar ceilings, a stone fireplace and a wraparound deck bring the outdoors in, all year round.",
+    amenities: ["Fireplace", "Wraparound Deck", "Hot Tub", "Mountain Views"],
+    agent: defaultAgent,
+    coordinates: { lat: 44.0582, lng: -121.3153 },
   },
   {
     id: "sea-view-penthouse",
+    slug: "sea-view-penthouse-miami",
     title: "Sea View Penthouse",
     location: "Miami",
     address: "321 Ocean Dr, Miami",
@@ -96,12 +219,37 @@ export const newInMarketProperties: Property[] = [
     beds: 3,
     baths: 3,
     area: 180,
+    garage: 2,
     image:
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80",
     imageAlt: "Bright bedroom with large window",
+    images: [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80",
+      img("photo-1600607687644-c7171b42498f"),
+      img("photo-1616486338812-3dadae4b4ace"),
+      img("photo-1600585152220-90363fe7e115"),
+    ],
+    imagesAlt: [
+      "Bright bedroom with large window",
+      "Living room with ocean view",
+      "Designer lounge area",
+      "Modern kitchen",
+    ],
+    description:
+      "Wake up to endless ocean views in this top-floor penthouse on Ocean Drive. Resort amenities, private terrace and sunrise balconies define coastal luxury living.",
+    amenities: [
+      "Ocean View Terrace",
+      "Resort Pool",
+      "Concierge Service",
+      "Private Gym",
+      "Smart Home System",
+    ],
+    agent: defaultAgent,
+    coordinates: { lat: 25.7907, lng: -80.128 },
   },
   {
     id: "central-studio",
+    slug: "central-studio-chicago",
     title: "Central Studio",
     location: "Chicago",
     address: "555 Main St, Chicago",
@@ -111,12 +259,24 @@ export const newInMarketProperties: Property[] = [
     beds: 1,
     baths: 1,
     area: 50,
+    garage: 0,
     image:
       "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?auto=format&fit=crop&w=800&q=80",
     imageAlt: "Cozy apartment interior",
+    images: [
+      "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?auto=format&fit=crop&w=800&q=80",
+      img("photo-1484154218962-a197022b5858"),
+    ],
+    imagesAlt: ["Cozy apartment interior", "Open plan studio space"],
+    description:
+      "A smart, efficient studio in the heart of Chicago. Clever built-ins, abundant light and unbeatable access to the Loop make it perfect for city living.",
+    amenities: ["Doorman Building", "Fitness Center", "Rooftop Deck"],
+    agent: defaultAgent,
+    coordinates: { lat: 41.8781, lng: -87.6298 },
   },
   {
     id: "garden-villa",
+    slug: "garden-villa-austin",
     title: "Garden Villa",
     location: "Austin",
     address: "999 Oak Ln, Austin",
@@ -127,12 +287,29 @@ export const newInMarketProperties: Property[] = [
     beds: 2,
     baths: 2,
     area: 110,
+    garage: 1,
     image:
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
     imageAlt: "Modern minimalist home exterior",
+    images: [
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
+      img("photo-1600585154526-990dced4db0d"),
+      img("photo-1615873968403-89e068629265"),
+    ],
+    imagesAlt: [
+      "Modern minimalist home exterior",
+      "Open kitchen and living area",
+      "Calm bedroom retreat",
+    ],
+    description:
+      "Minimalist villa wrapped in native landscaping. Polished concrete, shaded patios and a private garden offer quiet luxury minutes from South Congress.",
+    amenities: ["Private Garden", "Covered Patio", "Smart Home System", "Pet Friendly"],
+    agent: defaultAgent,
+    coordinates: { lat: 30.2672, lng: -97.7431 },
   },
   {
     id: "sunset-ridge-villa",
+    slug: "sunset-ridge-villa-los-angeles",
     title: "Sunset Ridge Villa",
     location: "Los Angeles",
     address: "742 Sunset Ridge Dr, Los Angeles",
@@ -142,12 +319,37 @@ export const newInMarketProperties: Property[] = [
     beds: 4,
     baths: 3.5,
     area: 320,
+    garage: 2,
     image:
       "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80",
     imageAlt: "Luxury villa with pool at dusk",
+    images: [
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80",
+      img("photo-1600607687939-ce8a6c25118c"),
+      img("photo-1600607687920-4e2a09cf159d"),
+      img("photo-1595526114035-0d45ed16cfbf"),
+    ],
+    imagesAlt: [
+      "Luxury villa with pool at dusk",
+      "Great room with disappearing glass walls",
+      "Formal lounge",
+      "Primary suite",
+    ],
+    description:
+      "Above the Sunset Strip, this architectural villa captures canyon-to-city views. Infinity pool, screening room and walls of glass deliver the definitive LA lifestyle.",
+    amenities: [
+      "Infinity Pool",
+      "Screening Room",
+      "Smart Home System",
+      "Wine Cellar",
+      "Electric Vehicle Charging",
+    ],
+    agent: defaultAgent,
+    coordinates: { lat: 34.0522, lng: -118.2437 },
   },
   {
     id: "palm-court-estate",
+    slug: "palm-court-estate-palm-springs",
     title: "Palm Court Estate",
     location: "Palm Springs",
     address: "18 Palm Court Dr, Palm Springs",
@@ -157,12 +359,37 @@ export const newInMarketProperties: Property[] = [
     beds: 5,
     baths: 4,
     area: 410,
+    garage: 3,
     image:
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
     imageAlt: "Modern estate with pool and palm trees",
+    images: [
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+      img("photo-1600585154526-990dced4db0d"),
+      img("photo-1616486338812-3dadae4b4ace"),
+      img("photo-1556912167-f556f1f39fdf"),
+    ],
+    imagesAlt: [
+      "Modern estate with pool and palm trees",
+      "Resort-style living pavilion",
+      "Entertainer's lounge",
+      "Gourmet kitchen",
+    ],
+    description:
+      "Mid-century soul meets modern comfort behind private gates. Saltwater pool, citrus grove and detached casita on nearly half an acre in the heart of Palm Springs.",
+    amenities: [
+      "Saltwater Pool",
+      "Guest Casita",
+      "Citrus Grove",
+      "Outdoor Kitchen",
+      "Smart Home System",
+    ],
+    agent: defaultAgent,
+    coordinates: { lat: 33.8303, lng: -116.5453 },
   },
   {
     id: "meridian-sky-loft",
+    slug: "meridian-sky-loft-new-york",
     title: "Meridian Sky Loft",
     location: "New York",
     address: "77 Lexington Ave, New York",
@@ -173,12 +400,34 @@ export const newInMarketProperties: Property[] = [
     beds: 2,
     baths: 2,
     area: 135,
+    garage: 1,
     image:
       "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80",
     imageAlt: "Bright loft apartment interior",
+    images: [
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80",
+      img("photo-1493809842364-78817add7ffb"),
+      img("photo-1600210492486-724fe5c67fb0"),
+    ],
+    imagesAlt: [
+      "Bright loft apartment interior",
+      "Open plan living and dining",
+      "Home office corner",
+    ],
+    description:
+      "Soaring ceilings and oversized arched windows define this Lexington Avenue loft. Full-service building with gym, lounge and roof deck in prime Murray Hill.",
+    amenities: [
+      "Doorman Building",
+      "Fitness Center",
+      "Roof Deck",
+      "In-unit Laundry",
+    ],
+    agent: defaultAgent,
+    coordinates: { lat: 40.758, lng: -73.9855 },
   },
   {
     id: "lakeview-modern-house",
+    slug: "lakeview-modern-house-denver",
     title: "Lakeview Modern House",
     location: "Denver",
     address: "204 Lakeview Cir, Denver",
@@ -188,12 +437,37 @@ export const newInMarketProperties: Property[] = [
     beds: 4,
     baths: 3,
     area: 260,
+    garage: 2,
     image:
       "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=800&q=80",
     imageAlt: "Modern house kitchen and living space",
+    images: [
+      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=800&q=80",
+      img("photo-1600585154340-be6161a56a0c"),
+      img("photo-1615873968403-89e068629265"),
+      img("photo-1595526114035-0d45ed16cfbf"),
+    ],
+    imagesAlt: [
+      "Modern house kitchen and living space",
+      "Front elevation at golden hour",
+      "Family room with fireplace",
+      "Primary bedroom",
+    ],
+    description:
+      "Crisp modern lines meet mountain views in this Denver standout. Chef's kitchen, main-floor office and a sunny backyard deck complete the package.",
+    amenities: [
+      "Mountain Views",
+      "Home Office",
+      "Fireplace",
+      "Backyard Deck",
+      "Central Heating & Cooling",
+    ],
+    agent: defaultAgent,
+    coordinates: { lat: 39.7392, lng: -104.9903 },
   },
   {
     id: "coral-bay-residence",
+    slug: "coral-bay-residence-san-diego",
     title: "Coral Bay Residence",
     location: "San Diego",
     address: "310 Coral Bay Ave, San Diego",
@@ -203,12 +477,34 @@ export const newInMarketProperties: Property[] = [
     beds: 3,
     baths: 2.5,
     area: 210,
+    garage: 2,
     image:
       "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=800&q=80",
     imageAlt: "Suburban house with garage exterior",
+    images: [
+      "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=800&q=80",
+      img("photo-1600585154526-990dced4db0d"),
+      img("photo-1484154218962-a197022b5858"),
+    ],
+    imagesAlt: [
+      "Suburban house with garage exterior",
+      "Kitchen with quartz waterfall island",
+      "Sunny breakfast nook",
+    ],
+    description:
+      "Coastal contemporary living near the bay. Vaulted ceilings, owned solar and a drought-smart garden deliver style with everyday ease.",
+    amenities: [
+      "Owned Solar",
+      "Drought-smart Garden",
+      "Home Office",
+      "Central Heating & Cooling",
+    ],
+    agent: defaultAgent,
+    coordinates: { lat: 32.7157, lng: -117.1611 },
   },
   {
     id: "downtown-design-apartment",
+    slug: "downtown-design-apartment-san-francisco",
     title: "Downtown Design Apartment",
     location: "San Francisco",
     address: "88 Market St, San Francisco",
@@ -219,12 +515,29 @@ export const newInMarketProperties: Property[] = [
     beds: 2,
     baths: 1,
     area: 95,
+    garage: 1,
     image:
       "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=800&q=80",
     imageAlt: "Open plan apartment living room",
+    images: [
+      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=800&q=80",
+      img("photo-1522708323590-d24dbb6b0267"),
+      img("photo-1556912167-f556f1f39fdf"),
+    ],
+    imagesAlt: [
+      "Open plan apartment living room",
+      "Second bedroom with bay windows",
+      "Renovated kitchen",
+    ],
+    description:
+      "Designer finishes and classic San Francisco bones on Market Street. Bay windows, in-unit laundry and transit at your door.",
+    amenities: ["Bay Windows", "In-unit Laundry", "Fitness Center", "Pet Friendly"],
+    agent: defaultAgent,
+    coordinates: { lat: 37.7749, lng: -122.4194 },
   },
   {
     id: "white-oak-villa",
+    slug: "white-oak-villa-dallas",
     title: "White Oak Villa",
     location: "Dallas",
     address: "45 White Oak Trl, Dallas",
@@ -234,12 +547,37 @@ export const newInMarketProperties: Property[] = [
     beds: 4,
     baths: 3,
     area: 285,
+    garage: 2,
     image:
       "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
     imageAlt: "Elegant white villa facade",
+    images: [
+      "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+      img("photo-1600607687939-ce8a6c25118c"),
+      img("photo-1600585152220-90363fe7e115"),
+      img("photo-1595526114035-0d45ed16cfbf"),
+    ],
+    imagesAlt: [
+      "Elegant white villa facade",
+      "Double-height great room",
+      "Kitchen with butler's pantry",
+      "Guest suite",
+    ],
+    description:
+      "Stately white villa on a heritage oak lot. Double-height great room, butler's pantry and a loggia with fireplace anchor gracious Texas entertaining.",
+    amenities: [
+      "Heritage Oaks",
+      "Loggia with Fireplace",
+      "Butler's Pantry",
+      "Smart Home System",
+      "Central Heating & Cooling",
+    ],
+    agent: defaultAgent,
+    coordinates: { lat: 32.7767, lng: -96.797 },
   },
   {
     id: "harbor-light-penthouse",
+    slug: "harbor-light-penthouse-boston",
     title: "Harbor Light Penthouse",
     location: "Boston",
     address: "1 Harbor Light Way, Boston",
@@ -250,12 +588,35 @@ export const newInMarketProperties: Property[] = [
     beds: 3,
     baths: 2.5,
     area: 195,
+    garage: 2,
     image:
       "https://images.unsplash.com/photo-1600607687644-c7171b42498f?auto=format&fit=crop&w=800&q=80",
     imageAlt: "Penthouse living room with city view",
+    images: [
+      "https://images.unsplash.com/photo-1600607687644-c7171b42498f?auto=format&fit=crop&w=800&q=80",
+      img("photo-1616486338812-3dadae4b4ace"),
+      img("photo-1600607687920-4e2a09cf159d"),
+    ],
+    imagesAlt: [
+      "Penthouse living room with city view",
+      "Harborside dining room",
+      "Library lounge",
+    ],
+    description:
+      "Floor-to-ceiling harbor views from every principal room. Private elevator entry, two terraces and white-glove services in Boston's premier waterfront tower.",
+    amenities: [
+      "Harbor Views",
+      "Private Elevator Entry",
+      "Two Terraces",
+      "Concierge Service",
+      "Valet Parking",
+    ],
+    agent: defaultAgent,
+    coordinates: { lat: 42.3601, lng: -71.0589 },
   },
   {
     id: "cedar-grove-house",
+    slug: "cedar-grove-house-nashville",
     title: "Cedar Grove House",
     location: "Nashville",
     address: "612 Cedar Grove Rd, Nashville",
@@ -265,12 +626,35 @@ export const newInMarketProperties: Property[] = [
     beds: 3,
     baths: 2,
     area: 185,
+    garage: 2,
     image:
       "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=800&q=80",
     imageAlt: "Modern house exterior with garage",
+    images: [
+      "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=800&q=80",
+      img("photo-1600585154526-990dced4db0d"),
+      img("photo-1484154218962-a197022b5858"),
+    ],
+    imagesAlt: [
+      "Modern house exterior with garage",
+      "Open kitchen with island seating",
+      "Vaulted family room",
+    ],
+    description:
+      "New-traditional charmer under mature cedars. Vaulted family room, mudroom and a fenced backyard minutes from Nashville's greenways.",
+    amenities: [
+      "Fenced Backyard",
+      "Mudroom",
+      "Fireplace",
+      "Covered Porch",
+      "Central Heating & Cooling",
+    ],
+    agent: defaultAgent,
+    coordinates: { lat: 36.1627, lng: -86.7816 },
   },
   {
     id: "marina-sky-penthouse",
+    slug: "marina-sky-penthouse-miami",
     title: "Marina Sky Penthouse",
     location: "Miami",
     address: "900 Marina Blvd, Miami",
@@ -280,9 +664,34 @@ export const newInMarketProperties: Property[] = [
     beds: 4,
     baths: 4,
     area: 310,
+    garage: 2,
     image:
       "https://images.unsplash.com/photo-1600566752355-35792bedcfea?auto=format&fit=crop&w=800&q=80",
     imageAlt: "Luxury penthouse interior with large windows",
+    images: [
+      "https://images.unsplash.com/photo-1600566752355-35792bedcfea?auto=format&fit=crop&w=800&q=80",
+      img("photo-1600607687939-ce8a6c25118c"),
+      img("photo-1600585152220-90363fe7e115"),
+      img("photo-1595526114035-0d45ed16cfbf"),
+    ],
+    imagesAlt: [
+      "Luxury penthouse interior with large windows",
+      "Bayfront great room",
+      "Italian kitchen",
+      "Primary suite with spa bath",
+    ],
+    description:
+      "Sky-high over Biscayne Bay, this half-floor penthouse offers 10-foot glass, summer kitchen terrace and private marina slip. Miami's finest full-service living.",
+    amenities: [
+      "Bayfront Terrace",
+      "Summer Kitchen",
+      "Private Marina Slip",
+      "Spa & Fitness Center",
+      "Smart Home System",
+      "Concierge Service",
+    ],
+    agent: defaultAgent,
+    coordinates: { lat: 25.775, lng: -80.185 },
   },
 ];
 

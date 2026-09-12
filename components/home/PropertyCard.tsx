@@ -1,4 +1,6 @@
+import Link from "next/link";
 import Icon from "@/components/ui/Icon";
+import SaveButton from "@/components/home/SaveButton";
 import { formatPrice, type Property } from "@/types/property";
 
 interface PropertyCardProps {
@@ -9,19 +11,17 @@ export default function PropertyCard({ property }: PropertyCardProps) {
   const isRent = property.status === "rent";
 
   return (
-    <article className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-xl bg-white shadow-card transition-all duration-300 hover:shadow-soft dark:bg-white/5">
+    <Link
+      href={`/property/${property.slug}`}
+      className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-xl bg-white shadow-card transition-all duration-300 hover:shadow-soft dark:bg-white/5"
+    >
       <div className="relative aspect-[4/3] overflow-hidden">
         <img
           alt={property.imageAlt}
           src={property.image}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
-        <button
-          aria-label="Save property"
-          className="absolute top-3 right-3 rounded-full bg-white/90 p-2 text-nordic transition-colors hover:bg-mosque hover:text-white dark:bg-black/50 dark:text-white"
-        >
-          <Icon name="heart" className="h-5 w-5" />
-        </button>
+        <SaveButton className="absolute top-3 right-3 rounded-full bg-white/90 p-2 text-nordic transition-colors hover:bg-mosque hover:text-white dark:bg-black/50 dark:text-white" />
         <div
           className={
             isRent
@@ -60,6 +60,6 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           </div>
         </div>
       </div>
-    </article>
+    </Link>
   );
 }

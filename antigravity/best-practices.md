@@ -150,6 +150,7 @@ export async function generateMetadata(
 
 - **Recomendaciones adicionales**:
   - La página debe ser **Server Component** para que los metatags se rendericen en el HTML del servidor (los scrapers no ejecutan JavaScript).
+  - ⚠️ **No pongas `loading.tsx` en el segmento `[slug]`**: bug conocido de Next 16 (issues #76474, #93008, #93239) — con `loading.tsx` el streaming vacía cabeceras con HTTP 200 antes de que el boundary capture `notFound()`, y los slugs inexistentes devuelven 200 (soft-404, malo para SEO). Sin `loading.tsx`, `notFound()` devuelve un 404 real. El mapa conserva su skeleton vía `dynamic(..., { loading })`.
   - Usa `summary_large_image` en Twitter/X para foto grande; sin esto la tarjeta sale pequeña.
   - Incluye `og:locale` (`es_ES` / `en_US`) si la app es multi-idioma.
   - Verifica cada cambio con los validadores: [Meta Sharing Debugger](https://developers.facebook.com/tools/debug/), [X Card Validator](https://cards-dev.twitter.com/validator) y enviándote el enlace por WhatsApp.

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import Icon from "@/components/ui/Icon";
 
 const links = ["Buy", "Rent", "Sell", "Saved Homes"];
@@ -13,14 +14,18 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 border-b border-nordic/10 bg-clearday/95 backdrop-blur-md dark:border-white/5 dark:bg-[#0f231f]/95">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
-          <div className="flex shrink-0 cursor-pointer items-center gap-2">
+          <Link
+            href="/"
+            aria-label="LuxeEstate home"
+            className="flex shrink-0 cursor-pointer items-center gap-2"
+          >
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-nordic">
               <Icon name="building" className="h-5 w-5 text-white" />
             </div>
             <span className="text-xl font-semibold tracking-tight text-nordic dark:text-white">
               LuxeEstate
             </span>
-          </div>
+          </Link>
 
           <div className="hidden items-center space-x-8 md:flex">
             {links.map((link) => (

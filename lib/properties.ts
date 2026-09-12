@@ -12,6 +12,7 @@ export type PropertyStatusFilter = "all" | PropertyStatus;
 
 interface PropertyRow {
   id: string;
+  slug?: string | null;
   title: string;
   location: string;
   address: string;
@@ -22,15 +23,33 @@ interface PropertyRow {
   beds: number;
   baths: number | string;
   area: number | string;
+  garage?: number | string | null;
   image: string;
   image_alt: string;
+  images?: string[] | null;
+  images_alt?: string[] | null;
+  description?: string | null;
+  amenities?: string[] | null;
+  agent?: Property["agent"] | null;
+  lat?: number | string | null;
+  lng?: number | string | null;
   tag: Property["tag"] | null;
   featured: boolean;
 }
 
 function mapRowToProperty(row: PropertyRow): Property {
+  const images =
+    row.images && row.images.length > 0 ? row.images : [row.image];
+  const imagesAlt =
+    row.images_alt && row.images_alt.length > 0
+      ? row.images_alt
+      : images.map((_, i) => (i === 0 ? row.image_alt : `${row.title} — photo ${i + 1}`));
+  const lat = row.lat === null || row.lat === undefined ? 0 : Number(row.lat);
+  const lng = row.lng === null || row.lng === undefined ? 0 : Number(row.lng);
+
   return {
     id: row.id,
+    slug: row.slug ?? row.id,
     title: row.title,
     location: row.location,
     address: row.address,
@@ -41,8 +60,21 @@ function mapRowToProperty(row: PropertyRow): Property {
     beds: Number(row.beds),
     baths: Number(row.baths),
     area: Number(row.area),
-    image: row.image,
-    imageAlt: row.image_alt,
+    garage: row.garage === null || row.garage === undefined ? 0 : Number(row.garage),
+    image: images[0],
+    imageAlt: imagesAlt[0],
+    images,
+    imagesAlt,
+    description: row.description ?? "",
+    amenities: row.amenities ?? [],
+    agent: row.agent ?? {
+      name: "LuxeEstate Advisor",
+      photo: "",
+      rating: "Verified Agent",
+      phone: "",
+      whatsapp: "",
+    },
+    coordinates: { lat, lng },
     ...(row.tag ? { tag: row.tag } : {}),
     ...(row.featured ? { featured: true } : {}),
   };
@@ -160,3 +192,101 @@ export const getPaginatedProperties = cache(
     };
   },
 );
+
+function findLocalBySlug(slug: string): Property | null {
+  const all = [...featuredProperties, ...newInMarketProperties];
+  return (
+    all.find((p) => p.slug === slug || p.id === slug) ?? null
+  );
+}
+
+/**
+ * Completa los campos que la fila de Supabase aún no trae (BD sin migrar)
+ * con los datos locales. Cuando la migración 003 esté aplicada, la BD manda.
+ */
+function completeWithLocal(row: PropertyRow, mapped: Property): Property {
+  const local = findLocalBySlug(row.id);
+  if (!local) return mapped;
+
+  return {
+    ...mapped,
+    slug: row.slug ?? local.slug,
+    garage:
+      row.garage === null || row.garage === undefined
+        ? local.garage
+        : mapped.garage,
+    images: row.images && row.images.length > 0 ? mapped.images : local.images,
+    imagesAlt:
+      row.images && row.images.length > 0 ? mapped.imagesAlt : local.imagesAlt,
+    description: row.description || local.description,
+    amenities:
+      row.amenities && row.amenities.length > 0
+        ? mapped.amenities
+        : local.amenities,
+    agent: row.agent?.name ? mapped.agent : local.agent,
+    coordinates:
+      row.lat === null ||
+      row.lat === undefined ||
+      row.lng === null ||
+      row.lng === undefined
+        ? local.coordinates
+        : mapped.coordinates,
+  };
+}
+
+/**
+ * Lee UNA propiedad por SLUG en el SERVIDOR (Server Component).
+ * Busca primero en Supabase (columna `slug`); si no hay credenciales
+ * o falla, usa los datos locales. Acepta `id` como fallback.
+ */
+export const getPropertyBySlug = cache(
+  async (slug: string): Promise<Property | null> => {
+    const supabase = createServerSupabaseClient();
+    if (!supabase) return findLocalBySlug(slug);
+
+    // Intento por slug; si la columna aún no existe en BD, cae al fallback.
+    const { data, error } = await supabase
+      .from("properties")
+      .select("*")
+      .eq("slug", slug)
+      .maybeSingle();
+
+    if (!error && data) {
+      const row = data as PropertyRow;
+      return completeWithLocal(row, mapRowToProperty(row));
+    }
+
+    // Fallback por id (BD sin columna slug) y luego datos locales.
+    const byId = await supabase
+      .from("properties")
+      .select("*")
+      .eq("id", slug)
+      .maybeSingle();
+    if (!byId.error && byId.data) {
+      const row = byId.data as PropertyRow;
+      return completeWithLocal(row, mapRowToProperty(row));
+    }
+
+    return findLocalBySlug(slug);
+  },
+);
+
+/**
+ * Slugs para `generateStaticParams` de la página de detalle.
+ * Sin Supabase devuelve los slugs locales (build seguro).
+ */
+export const getAllPropertySlugs = cache(async (): Promise<string[]> => {
+  const supabase = createServerSupabaseClient();
+  if (!supabase) {
+    return [...featuredProperties, ...newInMarketProperties].map((p) => p.slug);
+  }
+
+  const { data, error } = await supabase.from("properties").select("slug, id");
+  if (error || !data) {
+    return [...featuredProperties, ...newInMarketProperties].map((p) => p.slug);
+  }
+
+  return (data as { slug?: string | null; id: string }[]).map(
+    (r) => r.slug ?? r.id,
+  );
+});
