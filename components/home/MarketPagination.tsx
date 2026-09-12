@@ -1,18 +1,24 @@
 import Link from "next/link";
 import type { PropertyStatusFilter } from "@/lib/properties";
+import type { PropertyFilters } from "@/lib/filters";
+import { buildSearchParams } from "@/lib/filters";
 
 interface MarketPaginationProps {
   page: number;
   totalPages: number;
   total: number;
   status: PropertyStatusFilter;
+  filters: PropertyFilters;
 }
 
-function pageHref(page: number, status: PropertyStatusFilter): string {
-  const params = new URLSearchParams();
-  params.set("page", String(page));
-  if (status !== "all") params.set("status", status);
-  return `/?${params.toString()}#market`;
+function pageHref(
+  page: number,
+  status: PropertyStatusFilter,
+  filters: PropertyFilters,
+): string {
+  const qs = buildSearchParams({ ...filters, status });
+  const sep = qs ? `${qs}&` : "";
+  return `/?${sep}page=${page}#market`;
 }
 
 /** Devuelve los números de página a mostrar (ventana de hasta 5). */
@@ -27,6 +33,7 @@ export default function MarketPagination({
   totalPages,
   total,
   status,
+  filters,
 }: MarketPaginationProps) {
   if (totalPages <= 1) return null;
 
@@ -45,7 +52,7 @@ export default function MarketPagination({
       <div className="flex flex-wrap items-center justify-center gap-2">
         {page > 1 ? (
           <Link
-            href={pageHref(page - 1, status)}
+            href={pageHref(page - 1, status, filters)}
             className={`${linkBase} ${linkIdle}`}
           >
             ← Anterior
@@ -59,7 +66,7 @@ export default function MarketPagination({
         {visiblePages(page, totalPages).map((p) => (
           <Link
             key={p}
-            href={pageHref(p, status)}
+            href={pageHref(p, status, filters)}
             aria-current={p === page ? "page" : undefined}
             className={`${linkBase} ${p === page ? linkActive : linkIdle}`}
           >
@@ -69,7 +76,7 @@ export default function MarketPagination({
 
         {page < totalPages ? (
           <Link
-            href={pageHref(page + 1, status)}
+            href={pageHref(page + 1, status, filters)}
             className={`${linkBase} ${linkIdle}`}
           >
             Siguiente →

@@ -1,0 +1,404 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Icon from "@/components/ui/Icon";
+import {
+  AMENITY_OPTIONS,
+  PROPERTY_TYPES,
+  buildSearchParams,
+  formatPriceShort,
+  parseFilters,
+  type PropertyFilters,
+} from "@/lib/filters";
+
+interface FilterModalProps {
+  open: boolean;
+  onClose: () => void;
+  total: number;
+}
+
+const SLIDER_MAX = 10_000_000;
+
+function paramsRecord(sp: URLSearchParams): Record<string, string> {
+  return Object.fromEntries(sp.entries());
+}
+
+/**
+ * Client island: modal de filtros idéntico al diseño
+ * (`antigravity/resources/search_filters_screen/code.html`),
+ * adaptado a nuestros tokens (Mosque / Clear Day / Nordic / SF Pro).
+ *
+ * Los filtros viven en la URL (fuente única de verdad): cada cambio hace
+ * `router.push` y la página se re-renderiza en el servidor.
+ */
+export default function FilterModal({ open, onClose, total }: FilterModalProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [draft, setDraft] = useState<PropertyFilters>({});
+  const [wasOpen, setWasOpen] = useState(false);
+  const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Sincroniza el borrador con la URL al abrir (ajuste durante el render,
+  // patrón recomendado frente a setState dentro de un effect).
+  if (open && !wasOpen) {
+    setWasOpen(true);
+    setDraft(parseFilters(paramsRecord(searchParams)));
+  } else if (!open && wasOpen) {
+    setWasOpen(false);
+  }
+
+  // Cerrar con ESC + bloquear scroll del body
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  const apply = (next: PropertyFilters) => {
+    const status = searchParams.get("status") ?? undefined;
+    const qs = buildSearchParams({
+      ...next,
+      status: status as "sale" | "rent" | undefined,
+    });
+    router.push(qs ? `/?${qs}` : "/");
+  };
+
+  const update = (patch: Partial<PropertyFilters>, immediate = true) => {
+    const next = { ...draft, ...patch };
+    setDraft(next);
+    if (immediate) {
+      apply(next);
+    } else {
+      if (debounce.current) clearTimeout(debounce.current);
+      debounce.current = setTimeout(() => apply(next), 500);
+    }
+  };
+
+  const clearAll = () => {
+    setDraft({});
+    router.push("/");
+  };
+
+  const toggleAmenity = (value: string) => {
+    const current = draft.amenities ?? [];
+    update({
+      amenities: current.includes(value)
+        ? current.filter((a) => a !== value)
+        : [...current, value],
+    });
+  };
+
+  const rangeLabel =
+    draft.minPrice !== undefined && draft.maxPrice !== undefined
+      ? `${formatPriceShort(draft.minPrice)} – ${formatPriceShort(draft.maxPrice)}`
+      : draft.minPrice !== undefined
+        ? `From ${formatPriceShort(draft.minPrice)}`
+        : draft.maxPrice !== undefined
+          ? `Up to ${formatPriceShort(draft.maxPrice)}`
+          : "Any price";
+
+  const minPct =
+    draft.minPrice !== undefined
+      ? Math.min(100, (draft.minPrice / SLIDER_MAX) * 100)
+      : 0;
+  const maxPct =
+    draft.maxPrice !== undefined
+      ? Math.min(100, (draft.maxPrice / SLIDER_MAX) * 100)
+      : 100;
+
+  const parseMoney = (raw: string): number | undefined => {
+    const n = Number(raw.replace(/[^0-9]/g, ""));
+    return raw.trim() === "" || !Number.isFinite(n) ? undefined : n;
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Search filters"
+    >
+      <div
+        className="absolute inset-0 bg-nordic/40 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <main className="relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl dark:bg-[#0f231f]">
+        {/* Header */}
+        <header className="sticky top-0 z-30 flex items-center justify-between border-b border-nordic/5 bg-white px-8 py-6 dark:border-white/10 dark:bg-[#0f231f]">
+          <h1 className="text-2xl font-semibold tracking-tight text-nordic dark:text-white">
+            Filters
+          </h1>
+          <button
+            onClick={onClose}
+            aria-label="Close filters"
+            className="rounded-full p-2 text-nordic-muted transition-colors hover:bg-black/5 dark:hover:bg-white/10"
+          >
+            <Icon name="close" className="h-5 w-5" />
+          </button>
+        </header>
+
+        {/* Scrollable content */}
+        <div className="hide-scroll flex-1 space-y-10 overflow-y-auto p-8">
+          {/* Location */}
+          <section>
+            <label
+              htmlFor="filter-city"
+              className="mb-3 block text-xs font-semibold tracking-wider text-nordic-muted uppercase"
+            >
+              Location
+            </label>
+            <div className="group relative">
+              <Icon
+                name="place"
+                className="absolute top-3.5 left-4 h-5 w-5 text-nordic-muted/60 transition-colors group-focus-within:text-mosque"
+              />
+              <input
+                id="filter-city"
+                type="text"
+                placeholder="City, neighborhood, or address"
+                value={draft.city ?? ""}
+                onChange={(e) => update({ city: e.target.value || undefined }, false)}
+                className="w-full rounded-lg border-0 bg-clearday py-3 pr-4 pl-12 text-nordic shadow-sm transition-all placeholder:text-nordic-muted/60 focus:bg-white focus:ring-2 focus:ring-mosque dark:bg-white/5 dark:text-white dark:focus:bg-white/10"
+              />
+            </div>
+          </section>
+
+          {/* Price Range */}
+          <section>
+            <div className="mb-4 flex items-end justify-between">
+              <label className="block text-xs font-semibold tracking-wider text-nordic-muted uppercase">
+                Price Range
+              </label>
+              <span className="text-sm font-medium text-mosque">{rangeLabel}</span>
+            </div>
+            <div className="relative mb-6 flex h-12 items-center px-2">
+              <div className="absolute w-full overflow-hidden rounded-full bg-nordic/10">
+                <div
+                  className="h-1 bg-mosque"
+                  style={{
+                    marginLeft: `${minPct}%`,
+                    width: `${Math.max(0, maxPct - minPct)}%`,
+                  }}
+                />
+              </div>
+              <div
+                className="absolute z-10 -ml-3 h-6 w-6 rounded-full border-2 border-mosque bg-white shadow-md"
+                style={{ left: `${minPct}%` }}
+              />
+              <div
+                className="absolute z-10 -ml-3 h-6 w-6 rounded-full border-2 border-mosque bg-white shadow-md"
+                style={{ left: `${maxPct}%` }}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="rounded-lg bg-clearday p-3 transition-colors focus-within:border-mosque/30 dark:bg-white/5">
+                <label
+                  htmlFor="filter-min"
+                  className="mb-1 block text-[10px] font-medium text-nordic-muted uppercase"
+                >
+                  Min Price
+                </label>
+                <div className="flex items-center">
+                  <span className="mr-1 text-nordic-muted/60">$</span>
+                  <input
+                    id="filter-min"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="No min"
+                    value={
+                      draft.minPrice !== undefined
+                        ? draft.minPrice.toLocaleString("en-US")
+                        : ""
+                    }
+                    onChange={(e) =>
+                      update({ minPrice: parseMoney(e.target.value) }, false)
+                    }
+                    className="w-full border-0 bg-transparent p-0 text-sm font-medium text-nordic focus:ring-0 dark:text-white"
+                  />
+                </div>
+              </div>
+              <div className="rounded-lg bg-clearday p-3 transition-colors focus-within:border-mosque/30 dark:bg-white/5">
+                <label
+                  htmlFor="filter-max"
+                  className="mb-1 block text-[10px] font-medium text-nordic-muted uppercase"
+                >
+                  Max Price
+                </label>
+                <div className="flex items-center">
+                  <span className="mr-1 text-nordic-muted/60">$</span>
+                  <input
+                    id="filter-max"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="No max"
+                    value={
+                      draft.maxPrice !== undefined
+                        ? draft.maxPrice.toLocaleString("en-US")
+                        : ""
+                    }
+                    onChange={(e) =>
+                      update({ maxPrice: parseMoney(e.target.value) }, false)
+                    }
+                    className="w-full border-0 bg-transparent p-0 text-sm font-medium text-nordic focus:ring-0 dark:text-white"
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Property Details */}
+          <section className="grid grid-cols-1 gap-8 md:grid-cols-2">
+            <div className="space-y-3">
+              <label
+                htmlFor="filter-type"
+                className="block text-xs font-semibold tracking-wider text-nordic-muted uppercase"
+              >
+                Property Type
+              </label>
+              <div className="relative">
+                <select
+                  id="filter-type"
+                  value={draft.type ?? ""}
+                  onChange={(e) =>
+                    update({
+                      type: (e.target.value || undefined) as
+                        | PropertyFilters["type"]
+                        | undefined,
+                    })
+                  }
+                  className="w-full cursor-pointer appearance-none rounded-lg border-0 bg-clearday py-3 pr-10 pl-4 text-nordic focus:ring-2 focus:ring-mosque dark:bg-white/5 dark:text-white"
+                >
+                  <option value="">Any Type</option>
+                  {PROPERTY_TYPES.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+                <Icon
+                  name="arrow"
+                  className="pointer-events-none absolute top-3.5 right-3 h-5 w-5 rotate-90 text-nordic-muted/60"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <Stepper
+                label="Bedrooms"
+                value={draft.beds ?? 0}
+                onChange={(v) =>
+                  update({ beds: v === 0 ? undefined : v })
+                }
+              />
+              <Stepper
+                label="Bathrooms"
+                value={draft.baths ?? 0}
+                onChange={(v) =>
+                  update({ baths: v === 0 ? undefined : v })
+                }
+              />
+            </div>
+          </section>
+
+          {/* Amenities */}
+          <section>
+            <span className="mb-4 block text-xs font-semibold tracking-wider text-nordic-muted uppercase">
+              Amenities &amp; Features
+            </span>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+              {AMENITY_OPTIONS.map((opt) => {
+                const active = draft.amenities?.includes(opt.value) ?? false;
+                return (
+                  <label key={opt.value} className="group relative cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="peer sr-only"
+                      checked={active}
+                      onChange={() => toggleAmenity(opt.value)}
+                    />
+                    <div
+                      className={
+                        active
+                          ? "flex h-full items-center justify-center gap-2 rounded-lg border border-mosque bg-mosque/5 px-4 py-3 text-sm font-medium text-mosque transition-all hover:bg-mosque/10 dark:bg-mosque/20"
+                          : "flex h-full items-center justify-center gap-2 rounded-lg border border-nordic/10 bg-white px-4 py-3 text-sm text-nordic-muted transition-all hover:border-nordic/20 peer-checked:border-mosque peer-checked:bg-mosque/5 peer-checked:text-mosque dark:border-white/10 dark:bg-white/5 dark:text-gray-300"
+                      }
+                    >
+                      <Icon name={opt.icon} className="h-5 w-5" />
+                      {opt.label}
+                    </div>
+                    {active && (
+                      <div className="absolute top-2 right-2 h-2 w-2 rounded-full bg-mosque" />
+                    )}
+                  </label>
+                );
+              })}
+            </div>
+          </section>
+        </div>
+
+        {/* Footer */}
+        <footer className="sticky bottom-0 z-30 flex items-center justify-between border-t border-nordic/5 bg-white px-8 py-6 dark:border-white/10 dark:bg-[#0f231f]">
+          <button
+            onClick={clearAll}
+            className="text-sm font-medium text-nordic-muted underline decoration-nordic/20 underline-offset-4 transition-colors hover:text-nordic dark:hover:text-white"
+          >
+            Clear all filters
+          </button>
+          <button
+            onClick={onClose}
+            className="flex transform items-center gap-2 rounded-lg bg-mosque px-8 py-3 font-medium text-white shadow-lg shadow-mosque/30 transition-all hover:bg-mosque/90 active:scale-95"
+          >
+            Show {total} {total === 1 ? "Home" : "Homes"}
+            <Icon name="arrow" className="h-4 w-4" />
+          </button>
+        </footer>
+      </main>
+    </div>
+  );
+}
+
+function Stepper({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-sm font-medium text-nordic dark:text-gray-100">
+        {label}
+      </span>
+      <div className="flex items-center space-x-3 rounded-full bg-clearday p-1 dark:bg-white/5">
+        <button
+          onClick={() => onChange(Math.max(0, value - 1))}
+          disabled={value === 0}
+          aria-label={`Fewer ${label}`}
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-nordic-muted shadow-sm transition-colors hover:text-mosque disabled:opacity-50 dark:bg-white/10"
+        >
+          <Icon name="minus" className="h-4 w-4" />
+        </button>
+        <span className="w-8 text-center text-sm font-semibold text-nordic dark:text-white">
+          {value === 0 ? "Any" : `${value}+`}
+        </span>
+        <button
+          onClick={() => onChange(Math.min(10, value + 1))}
+          aria-label={`More ${label}`}
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-mosque shadow-sm transition-colors hover:bg-mosque hover:text-white dark:bg-white/10"
+        >
+          <Icon name="plus" className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  );
+}

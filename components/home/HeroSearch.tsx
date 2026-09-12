@@ -3,9 +3,19 @@
 import { useState } from "react";
 import Icon from "@/components/ui/Icon";
 import { categoryFilters } from "@/data/properties";
+import FilterModal from "@/components/home/FilterModal";
+import FilterChips from "@/components/home/FilterChips";
+import { countActiveFilters, type PropertyFilters } from "@/lib/filters";
 
-export default function HeroSearch() {
+interface HeroSearchProps {
+  filters: PropertyFilters;
+  total: number;
+}
+
+export default function HeroSearch({ filters, total }: HeroSearchProps) {
   const [category, setCategory] = useState<string>("All");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const activeCount = countActiveFilters(filters);
 
   return (
     <section className="py-12 md:py-16">
@@ -51,11 +61,27 @@ export default function HeroSearch() {
             </button>
           ))}
           <div className="mx-2 h-6 w-px bg-nordic/10" />
-          <button className="flex items-center gap-1 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap text-nordic transition-colors hover:bg-black/5 dark:text-white dark:hover:bg-white/5">
+          <button
+            onClick={() => setFiltersOpen(true)}
+            className="relative flex items-center gap-1 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap text-nordic transition-colors hover:bg-black/5 dark:text-white dark:hover:bg-white/5"
+          >
             <Icon name="tune" className="h-4 w-4" /> Filters
+            {activeCount > 0 && (
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-mosque text-[11px] font-bold text-white">
+                {activeCount}
+              </span>
+            )}
           </button>
         </div>
+
+        <FilterChips filters={filters} />
       </div>
+
+      <FilterModal
+        open={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+        total={total}
+      />
     </section>
   );
 }

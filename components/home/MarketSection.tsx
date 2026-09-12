@@ -1,15 +1,23 @@
+import Link from "next/link";
 import PropertyCard from "@/components/home/PropertyCard";
 import MarketTabs from "@/components/home/MarketTabs";
 import MarketPagination from "@/components/home/MarketPagination";
 import type { PaginatedProperties } from "@/lib/properties";
+import type { PropertyFilters } from "@/lib/filters";
 
 /**
  * Sección "New in Market" renderizada en el SERVIDOR.
- * Los datos ya vienen paginados desde Supabase (range + count exacto);
- * la navegación entre páginas y filtros usa Links con ?page= / ?status=,
+ * Los datos ya vienen filtrados y paginados desde Supabase;
+ * la navegación entre páginas y filtros usa Links con searchParams,
  * así que cada cambio lo resuelve el Server Component de la página.
  */
-export default function MarketSection({ data }: { data: PaginatedProperties }) {
+export default function MarketSection({
+  data,
+  filters,
+}: {
+  data: PaginatedProperties;
+  filters: PropertyFilters;
+}) {
   return (
     <section id="market" className="scroll-mt-24">
       <div className="mb-8 flex items-end justify-between">
@@ -21,13 +29,21 @@ export default function MarketSection({ data }: { data: PaginatedProperties }) {
             Fresh opportunities added this week.
           </p>
         </div>
-        <MarketTabs active={data.status} />
+        <MarketTabs active={data.status} filters={filters} />
       </div>
 
       {data.properties.length === 0 ? (
-        <p className="rounded-xl bg-white p-8 text-center text-sm text-nordic-muted dark:bg-white/5">
-          No hay propiedades para este filtro.
-        </p>
+        <div className="rounded-xl bg-white p-8 text-center dark:bg-white/5">
+          <p className="text-sm font-medium text-nordic dark:text-white">
+            No properties match these filters.
+          </p>
+          <Link
+            href="/#market"
+            className="mt-2 inline-block text-sm font-semibold text-mosque hover:underline"
+          >
+            Clear all filters
+          </Link>
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {data.properties.map((property) => (
@@ -41,6 +57,7 @@ export default function MarketSection({ data }: { data: PaginatedProperties }) {
         totalPages={data.totalPages}
         total={data.total}
         status={data.status}
+        filters={filters}
       />
     </section>
   );
