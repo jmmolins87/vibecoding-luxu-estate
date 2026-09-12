@@ -1,16 +1,27 @@
 import Navbar from "@/components/layout/Navbar";
 import HeroSearch from "@/components/home/HeroSearch";
 import FeaturedCollections from "@/components/home/FeaturedCollections";
-import NewInMarket from "@/components/home/NewInMarket";
+import MarketSection from "@/components/home/MarketSection";
+import type { PaginatedProperties } from "@/lib/properties";
+import type { Property } from "@/types/property";
 
-export default function HomeScreen() {
+interface HomeScreenProps {
+  featured: Property[];
+  market: PaginatedProperties;
+}
+
+/**
+ * Server Component: recibe los datos ya paginados desde `app/page.tsx`
+ * (que los obtiene en el servidor con Supabase). No hace fetch en cliente.
+ */
+export default function HomeScreen({ featured, market }: HomeScreenProps) {
   return (
     <div className="min-h-full bg-clearday font-display text-nordic antialiased selection:bg-mosque selection:text-white dark:bg-[#0f231f] dark:text-white">
       <Navbar />
       <main className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
         <HeroSearch />
-        <FeaturedCollections />
-        <NewInMarket />
+        <FeaturedCollections properties={featured} />
+        <MarketSection data={market} />
       </main>
     </div>
   );

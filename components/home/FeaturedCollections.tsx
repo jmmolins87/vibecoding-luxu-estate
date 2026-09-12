@@ -1,8 +1,13 @@
 import Icon from "@/components/ui/Icon";
 import { featuredProperties } from "@/data/properties";
+import type { Property } from "@/types/property";
 import FeaturedCard from "@/components/home/FeaturedCard";
 
-export default function FeaturedCollections() {
+export default function FeaturedCollections({
+  properties = featuredProperties,
+}: {
+  properties?: Property[];
+}) {
   return (
     <section className="mb-16">
       <div className="mb-8 flex items-end justify-between">
@@ -22,7 +27,7 @@ export default function FeaturedCollections() {
         </a>
       </div>
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        {featuredProperties.map((property) => (
+        {properties.map((property) => (
           <FeaturedCard key={property.id} property={property} />
         ))}
       </div>
