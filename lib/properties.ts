@@ -24,8 +24,6 @@ interface PropertyRow {
   baths: number | string;
   area: number | string;
   garage?: number | string | null;
-  image: string;
-  image_alt: string;
   images?: string[] | null;
   images_alt?: string[] | null;
   description?: string | null;
@@ -38,12 +36,12 @@ interface PropertyRow {
 }
 
 function mapRowToProperty(row: PropertyRow): Property {
-  const images =
-    row.images && row.images.length > 0 ? row.images : [row.image];
+  // Solo arrays: la foto principal es siempre `images[0]`.
+  const images = row.images && row.images.length > 0 ? row.images : [];
   const imagesAlt =
     row.images_alt && row.images_alt.length > 0
       ? row.images_alt
-      : images.map((_, i) => (i === 0 ? row.image_alt : `${row.title} — photo ${i + 1}`));
+      : images.map((_, i) => `${row.title} — photo ${i + 1}`);
   const lat = row.lat === null || row.lat === undefined ? 0 : Number(row.lat);
   const lng = row.lng === null || row.lng === undefined ? 0 : Number(row.lng);
 
@@ -61,8 +59,6 @@ function mapRowToProperty(row: PropertyRow): Property {
     baths: Number(row.baths),
     area: Number(row.area),
     garage: row.garage === null || row.garage === undefined ? 0 : Number(row.garage),
-    image: images[0],
-    imageAlt: imagesAlt[0],
     images,
     imagesAlt,
     description: row.description ?? "",

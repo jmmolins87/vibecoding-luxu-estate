@@ -30,11 +30,10 @@ export interface Property {
   baths: number;
   area: number;
   garage: number;
-  /** Compatibilidad: siempre equivale a `images[0]` */
-  image: string;
-  /** Compatibilidad: siempre equivale a `imagesAlt[0]` */
-  imageAlt: string;
-  /** Colección de 1 a N imágenes de la propiedad */
+  /**
+   * Colección de imágenes de la propiedad (mínimo 4: principal + 3 adicionales).
+   * `images[0]` es siempre la foto principal (portada, tarjetas y Open Graph).
+   */
   images: string[];
   imagesAlt: string[];
   description: string;

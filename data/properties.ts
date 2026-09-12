@@ -26,20 +26,19 @@ export const featuredProperties: Property[] = [
     baths: 4.5,
     area: 4200,
     garage: 3,
-    image:
-      "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80",
-    imageAlt: "Luxury modern villa exterior with pool",
     images: [
       "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80",
       img("photo-1600607687939-ce8a6c25118c"),
       img("photo-1600585152220-90363fe7e115"),
       img("photo-1595526114035-0d45ed16cfbf"),
+      img("photo-1600607687644-c7171b42498f"),
     ],
     imagesAlt: [
       "Luxury modern villa exterior with pool",
       "Open plan living room with floor-to-ceiling glass",
       "Designer kitchen with island",
       "Primary suite with garden view",
+      "Spa-inspired marble bathroom",
     ],
     description:
       "Experience modern luxury in this architecturally stunning glass pavilion in the heart of Beverly Hills. Floor-to-ceiling glass walls flood the interiors with natural light and open onto resort-style outdoor living with pool, spa and guest house.",
@@ -69,20 +68,19 @@ export const featuredProperties: Property[] = [
     baths: 3,
     area: 2100,
     garage: 2,
-    image:
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80",
-    imageAlt: "Modern interior living room with view",
     images: [
       "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80",
       img("photo-1600607687920-4e2a09cf159d"),
       img("photo-1616486338812-3dadae4b4ace"),
       img("photo-1556912167-f556f1f39fdf"),
+      img("photo-1595526114035-0d45ed16cfbf"),
     ],
     imagesAlt: [
       "Modern interior living room with view",
       "Lounge with panoramic city views",
       "Dining area with designer lighting",
       "Chef's kitchen with marble finishes",
+      "Primary bedroom with skyline view",
     ],
     description:
       "Perched above downtown Vancouver, this penthouse pairs skyline views with refined interiors. An open living plan, wraparound terrace and private elevator lobby make it the city's most coveted address.",
@@ -115,20 +113,19 @@ export const newInMarketProperties: Property[] = [
     baths: 2,
     area: 120,
     garage: 1,
-    image:
-      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=80",
-    imageAlt: "Modern white house facade",
     images: [
       "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=80",
       img("photo-1600585154526-990dced4db0d"),
       img("photo-1484154218962-a197022b5858"),
       img("photo-1595526114035-0d45ed16cfbf"),
+      img("photo-1615873968403-89e068629265"),
     ],
     imagesAlt: [
       "Modern white house facade",
       "Kitchen and living space",
       "Bright family living room",
       "Bedroom with natural light",
+      "Updated family bathroom",
     ],
     description:
       "A light-filled family home minutes from downtown Seattle. Updated kitchen, flexible living spaces and a low-maintenance garden make it ideal for modern family life.",
@@ -155,18 +152,19 @@ export const newInMarketProperties: Property[] = [
     baths: 1,
     area: 85,
     garage: 1,
-    image:
-      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80",
-    imageAlt: "Stylish apartment living room",
     images: [
       "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80",
       img("photo-1502672260266-1c1ef2d93688"),
       img("photo-1556912167-f556f1f39fdf"),
+      img("photo-1600607687644-c7171b42498f"),
+      img("photo-1493809842364-78817add7ffb"),
     ],
     imagesAlt: [
       "Stylish apartment living room",
       "Loft bedroom with large windows",
       "Compact modern kitchen",
+      "Industrial-style bathroom",
+      "Loft workspace with natural light",
     ],
     description:
       "Industrial-chic loft in Portland's arts district with exposed brick, high ceilings and oversized windows. Walk to galleries, cafés and transit.",
@@ -187,18 +185,19 @@ export const newInMarketProperties: Property[] = [
     baths: 2,
     area: 98,
     garage: 1,
-    image:
-      "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=800&q=80",
-    imageAlt: "Cabin in the woods exterior",
     images: [
       "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=800&q=80",
       img("photo-1600210492486-724fe5c67fb0"),
       img("photo-1615873968403-89e068629265"),
+      img("photo-1595526114035-0d45ed16cfbf"),
+      img("photo-1620626011761-996317b8d101"),
     ],
     imagesAlt: [
       "Cabin in the woods exterior",
       "Cozy wood-paneled living room",
       "Rustic dining corner",
+      "Guest bedroom with forest views",
+      "Rustic stone bathroom",
     ],
     description:
       "A serene mountain retreat surrounded by pines. Vaulted cedar ceilings, a stone fireplace and a wraparound deck bring the outdoors in, all year round.",
@@ -220,20 +219,19 @@ export const newInMarketProperties: Property[] = [
     baths: 3,
     area: 180,
     garage: 2,
-    image:
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80",
-    imageAlt: "Bright bedroom with large window",
     images: [
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80",
       img("photo-1600607687644-c7171b42498f"),
       img("photo-1616486338812-3dadae4b4ace"),
       img("photo-1600585152220-90363fe7e115"),
+      img("photo-1512917774080-9991f1c4c750"),
     ],
     imagesAlt: [
       "Bright bedroom with large window",
       "Living room with ocean view",
       "Designer lounge area",
       "Modern kitchen",
+      "Terrace with sunset ocean views",
     ],
     description:
       "Wake up to endless ocean views in this top-floor penthouse on Ocean Drive. Resort amenities, private terrace and sunrise balconies define coastal luxury living.",
@@ -260,14 +258,20 @@ export const newInMarketProperties: Property[] = [
     baths: 1,
     area: 50,
     garage: 0,
-    image:
-      "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?auto=format&fit=crop&w=800&q=80",
-    imageAlt: "Cozy apartment interior",
     images: [
       "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?auto=format&fit=crop&w=800&q=80",
       img("photo-1484154218962-a197022b5858"),
+      img("photo-1556912167-f556f1f39fdf"),
+      img("photo-1595526114035-0d45ed16cfbf"),
+      img("photo-1600607687644-c7171b42498f"),
     ],
-    imagesAlt: ["Cozy apartment interior", "Open plan studio space"],
+    imagesAlt: [
+      "Cozy apartment interior",
+      "Open plan studio space",
+      "Compact designer kitchen",
+      "Sleeping area with storage wall",
+      "Sleek studio bathroom",
+    ],
     description:
       "A smart, efficient studio in the heart of Chicago. Clever built-ins, abundant light and unbeatable access to the Loop make it perfect for city living.",
     amenities: ["Doorman Building", "Fitness Center", "Rooftop Deck"],
@@ -288,18 +292,19 @@ export const newInMarketProperties: Property[] = [
     baths: 2,
     area: 110,
     garage: 1,
-    image:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
-    imageAlt: "Modern minimalist home exterior",
     images: [
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
       img("photo-1600585154526-990dced4db0d"),
       img("photo-1615873968403-89e068629265"),
+      img("photo-1512917774080-9991f1c4c750"),
+      img("photo-1620626011761-996317b8d101"),
     ],
     imagesAlt: [
       "Modern minimalist home exterior",
       "Open kitchen and living area",
       "Calm bedroom retreat",
+      "Private garden and pool",
+      "Garden-view bathroom",
     ],
     description:
       "Minimalist villa wrapped in native landscaping. Polished concrete, shaded patios and a private garden offer quiet luxury minutes from South Congress.",
@@ -320,20 +325,19 @@ export const newInMarketProperties: Property[] = [
     baths: 3.5,
     area: 320,
     garage: 2,
-    image:
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80",
-    imageAlt: "Luxury villa with pool at dusk",
     images: [
       "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80",
       img("photo-1600607687939-ce8a6c25118c"),
       img("photo-1600607687920-4e2a09cf159d"),
       img("photo-1595526114035-0d45ed16cfbf"),
+      img("photo-1556912167-f556f1f39fdf"),
     ],
     imagesAlt: [
       "Luxury villa with pool at dusk",
       "Great room with disappearing glass walls",
       "Formal lounge",
       "Primary suite",
+      "Chef's kitchen with marble island",
     ],
     description:
       "Above the Sunset Strip, this architectural villa captures canyon-to-city views. Infinity pool, screening room and walls of glass deliver the definitive LA lifestyle.",
@@ -360,20 +364,19 @@ export const newInMarketProperties: Property[] = [
     baths: 4,
     area: 410,
     garage: 3,
-    image:
-      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
-    imageAlt: "Modern estate with pool and palm trees",
     images: [
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
       img("photo-1600585154526-990dced4db0d"),
       img("photo-1616486338812-3dadae4b4ace"),
       img("photo-1556912167-f556f1f39fdf"),
+      img("photo-1595526114035-0d45ed16cfbf"),
     ],
     imagesAlt: [
       "Modern estate with pool and palm trees",
       "Resort-style living pavilion",
       "Entertainer's lounge",
       "Gourmet kitchen",
+      "Guest casita bedroom",
     ],
     description:
       "Mid-century soul meets modern comfort behind private gates. Saltwater pool, citrus grove and detached casita on nearly half an acre in the heart of Palm Springs.",
@@ -401,18 +404,19 @@ export const newInMarketProperties: Property[] = [
     baths: 2,
     area: 135,
     garage: 1,
-    image:
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80",
-    imageAlt: "Bright loft apartment interior",
     images: [
       "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80",
       img("photo-1493809842364-78817add7ffb"),
       img("photo-1600210492486-724fe5c67fb0"),
+      img("photo-1600585152220-90363fe7e115"),
+      img("photo-1616594039964-ae9021a400a0"),
     ],
     imagesAlt: [
       "Bright loft apartment interior",
       "Open plan living and dining",
       "Home office corner",
+      "Open chef's kitchen",
+      "Mezzanine bedroom",
     ],
     description:
       "Soaring ceilings and oversized arched windows define this Lexington Avenue loft. Full-service building with gym, lounge and roof deck in prime Murray Hill.",
@@ -438,20 +442,19 @@ export const newInMarketProperties: Property[] = [
     baths: 3,
     area: 260,
     garage: 2,
-    image:
-      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=800&q=80",
-    imageAlt: "Modern house kitchen and living space",
     images: [
       "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=800&q=80",
       img("photo-1600585154340-be6161a56a0c"),
       img("photo-1615873968403-89e068629265"),
       img("photo-1595526114035-0d45ed16cfbf"),
+      img("photo-1600607687644-c7171b42498f"),
     ],
     imagesAlt: [
       "Modern house kitchen and living space",
       "Front elevation at golden hour",
       "Family room with fireplace",
       "Primary bedroom",
+      "Spa-like primary bathroom",
     ],
     description:
       "Crisp modern lines meet mountain views in this Denver standout. Chef's kitchen, main-floor office and a sunny backyard deck complete the package.",
@@ -478,18 +481,19 @@ export const newInMarketProperties: Property[] = [
     baths: 2.5,
     area: 210,
     garage: 2,
-    image:
-      "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=800&q=80",
-    imageAlt: "Suburban house with garage exterior",
     images: [
       "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=800&q=80",
       img("photo-1600585154526-990dced4db0d"),
       img("photo-1484154218962-a197022b5858"),
+      img("photo-1600607687939-ce8a6c25118c"),
+      img("photo-1595526114035-0d45ed16cfbf"),
     ],
     imagesAlt: [
       "Suburban house with garage exterior",
       "Kitchen with quartz waterfall island",
       "Sunny breakfast nook",
+      "Vaulted living room",
+      "Coastal primary bedroom",
     ],
     description:
       "Coastal contemporary living near the bay. Vaulted ceilings, owned solar and a drought-smart garden deliver style with everyday ease.",
@@ -516,18 +520,19 @@ export const newInMarketProperties: Property[] = [
     baths: 1,
     area: 95,
     garage: 1,
-    image:
-      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=800&q=80",
-    imageAlt: "Open plan apartment living room",
     images: [
       "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=800&q=80",
       img("photo-1522708323590-d24dbb6b0267"),
       img("photo-1556912167-f556f1f39fdf"),
+      img("photo-1615873968403-89e068629265"),
+      img("photo-1598928506311-c55ded91a20c"),
     ],
     imagesAlt: [
       "Open plan apartment living room",
       "Second bedroom with bay windows",
       "Renovated kitchen",
+      "Designer bathroom",
+      "Reading corner with bay light",
     ],
     description:
       "Designer finishes and classic San Francisco bones on Market Street. Bay windows, in-unit laundry and transit at your door.",
@@ -548,20 +553,19 @@ export const newInMarketProperties: Property[] = [
     baths: 3,
     area: 285,
     garage: 2,
-    image:
-      "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
-    imageAlt: "Elegant white villa facade",
     images: [
       "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
       img("photo-1600607687939-ce8a6c25118c"),
       img("photo-1600585152220-90363fe7e115"),
       img("photo-1595526114035-0d45ed16cfbf"),
+      img("photo-1600607687644-c7171b42498f"),
     ],
     imagesAlt: [
       "Elegant white villa facade",
       "Double-height great room",
       "Kitchen with butler's pantry",
       "Guest suite",
+      "Marble primary bathroom",
     ],
     description:
       "Stately white villa on a heritage oak lot. Double-height great room, butler's pantry and a loggia with fireplace anchor gracious Texas entertaining.",
@@ -589,18 +593,19 @@ export const newInMarketProperties: Property[] = [
     baths: 2.5,
     area: 195,
     garage: 2,
-    image:
-      "https://images.unsplash.com/photo-1600607687644-c7171b42498f?auto=format&fit=crop&w=800&q=80",
-    imageAlt: "Penthouse living room with city view",
     images: [
       "https://images.unsplash.com/photo-1600607687644-c7171b42498f?auto=format&fit=crop&w=800&q=80",
       img("photo-1616486338812-3dadae4b4ace"),
       img("photo-1600607687920-4e2a09cf159d"),
+      img("photo-1600585152220-90363fe7e115"),
+      img("photo-1616594039964-ae9021a400a0"),
     ],
     imagesAlt: [
       "Penthouse living room with city view",
       "Harborside dining room",
       "Library lounge",
+      "Harbor-view kitchen",
+      "Primary suite with water views",
     ],
     description:
       "Floor-to-ceiling harbor views from every principal room. Private elevator entry, two terraces and white-glove services in Boston's premier waterfront tower.",
@@ -627,18 +632,19 @@ export const newInMarketProperties: Property[] = [
     baths: 2,
     area: 185,
     garage: 2,
-    image:
-      "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=800&q=80",
-    imageAlt: "Modern house exterior with garage",
     images: [
       "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=800&q=80",
       img("photo-1600585154526-990dced4db0d"),
       img("photo-1484154218962-a197022b5858"),
+      img("photo-1595526114035-0d45ed16cfbf"),
+      img("photo-1615873968403-89e068629265"),
     ],
     imagesAlt: [
       "Modern house exterior with garage",
       "Open kitchen with island seating",
       "Vaulted family room",
+      "Bedroom with garden views",
+      "Updated hall bathroom",
     ],
     description:
       "New-traditional charmer under mature cedars. Vaulted family room, mudroom and a fenced backyard minutes from Nashville's greenways.",
@@ -665,20 +671,19 @@ export const newInMarketProperties: Property[] = [
     baths: 4,
     area: 310,
     garage: 2,
-    image:
-      "https://images.unsplash.com/photo-1600566752355-35792bedcfea?auto=format&fit=crop&w=800&q=80",
-    imageAlt: "Luxury penthouse interior with large windows",
     images: [
       "https://images.unsplash.com/photo-1600566752355-35792bedcfea?auto=format&fit=crop&w=800&q=80",
       img("photo-1600607687939-ce8a6c25118c"),
       img("photo-1600585152220-90363fe7e115"),
       img("photo-1595526114035-0d45ed16cfbf"),
+      img("photo-1512917774080-9991f1c4c750"),
     ],
     imagesAlt: [
       "Luxury penthouse interior with large windows",
       "Bayfront great room",
       "Italian kitchen",
       "Primary suite with spa bath",
+      "Sunset terrace over the marina",
     ],
     description:
       "Sky-high over Biscayne Bay, this half-floor penthouse offers 10-foot glass, summer kitchen terrace and private marina slip. Miami's finest full-service living.",

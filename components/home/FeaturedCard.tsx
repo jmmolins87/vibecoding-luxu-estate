@@ -15,8 +15,8 @@ export default function FeaturedCard({ property }: FeaturedCardProps) {
     >
       <div className="relative aspect-[4/3] w-full overflow-hidden">
         <img
-          alt={property.imageAlt}
-          src={property.image}
+          alt={property.imagesAlt[0]}
+          src={property.images[0]}
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
         {property.tag && (

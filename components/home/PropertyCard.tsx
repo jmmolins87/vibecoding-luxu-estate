@@ -17,8 +17,8 @@ export default function PropertyCard({ property }: PropertyCardProps) {
     >
       <div className="relative aspect-[4/3] overflow-hidden">
         <img
-          alt={property.imageAlt}
-          src={property.image}
+          alt={property.imagesAlt[0]}
+          src={property.images[0]}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
         <SaveButton className="absolute top-3 right-3 rounded-full bg-white/90 p-2 text-nordic transition-colors hover:bg-mosque hover:text-white dark:bg-black/50 dark:text-white" />
