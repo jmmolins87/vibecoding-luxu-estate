@@ -66,7 +66,7 @@ export default function FeaturedCard({ property }: FeaturedCardProps) {
             <Icon name="bath" className="h-5 w-5" /> {property.baths} {t("featured.baths")}
           </div>
           <div className="flex items-center gap-2 text-sm text-nordic-muted">
-            <Icon name="area" className="h-5 w-5" /> {property.area.toLocaleString()} m²
+            <Icon name="area" className="h-5 w-5" /> {property.area.toLocaleString(locale)} m²
           </div>
         </div>
       </div>
