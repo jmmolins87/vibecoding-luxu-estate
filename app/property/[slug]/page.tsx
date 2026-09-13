@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Navbar from "@/components/layout/Navbar";
+import Navbar from "@/components/layout/navbar/Navbar";
 import PropertyGallery from "@/components/property/PropertyGallery";
 import AgentCard from "@/components/property/AgentCard";
 import FeaturesGrid from "@/components/property/FeaturesGrid";

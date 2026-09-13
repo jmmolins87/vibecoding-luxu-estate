@@ -1,4 +1,4 @@
-import Navbar from "@/components/layout/Navbar";
+import Navbar from "@/components/layout/navbar/Navbar";
 import HeroSearch from "@/components/home/HeroSearch";
 import FeaturedCollections from "@/components/home/FeaturedCollections";
 import MarketSection from "@/components/home/MarketSection";

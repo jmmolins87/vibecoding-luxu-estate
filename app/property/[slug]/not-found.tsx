@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Navbar from "@/components/layout/Navbar";
+import Navbar from "@/components/layout/navbar/Navbar";
 import Icon from "@/components/ui/Icon";
 import { getLocale } from "@/lib/i18n/server";
 import { getDictionary, createTranslator } from "@/lib/i18n/dictionaries";
