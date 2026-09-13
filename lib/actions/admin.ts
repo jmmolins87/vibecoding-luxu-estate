@@ -148,6 +148,7 @@ export interface AdminPropertyDetail extends AdminPropertyRow {
   images_alt: string[];
   lat: number | null;
   lng: number | null;
+  year_built: number | null;
 }
 
 /** Fila completa para precargar el formulario de edición. */
@@ -173,11 +174,12 @@ export interface PropertyFormInput {
   price: number;
   priceSuffix: string;
   type: Property["type"];
-  status: Property["status"];
+  status: "sale" | "rent" | "sold";
   beds: number;
   baths: number;
   area: number;
   garage: number;
+  yearBuilt: string;
   image: string;
   imageAlt: string;
   tag: string;
@@ -191,7 +193,7 @@ export interface PropertyFormInput {
 }
 
 const PROPERTY_TYPES = ["House", "Apartment", "Villa", "Penthouse"] as const;
-const PROPERTY_STATUS = ["sale", "rent"] as const;
+const PROPERTY_STATUS = ["sale", "rent", "sold"] as const;
 
 function slugify(value: string): string {
   return value
@@ -228,6 +230,15 @@ function parsePropertyInput(input: PropertyFormInput) {
     const n = Number(v);
     return Number.isFinite(n) && n >= 0 ? n : fallback;
   };
+  const yearRaw = input.yearBuilt.trim();
+  const yearBuilt =
+    yearRaw === "" ? null : Math.trunc(Number(yearRaw));
+  if (
+    yearBuilt !== null &&
+    (!Number.isFinite(yearBuilt) || yearBuilt < 1000 || yearBuilt > 2100)
+  ) {
+    throw new Error("Año de construcción no válido.");
+  }
   const images = input.extraImages
     .split("\n")
     .map((s) => s.trim())
@@ -249,6 +260,7 @@ function parsePropertyInput(input: PropertyFormInput) {
     baths: num(input.baths),
     area: num(input.area),
     garage: Math.trunc(num(input.garage)),
+    year_built: yearBuilt,
     image: mainImage,
     image_alt: input.imageAlt.trim() || title,
     tag: input.tag.trim() || null,
@@ -584,6 +596,7 @@ export async function getAdminStats(): Promise<{
   featuredCount: number;
   forSale: number;
   forRent: number;
+  sold: number;
   totalUsers: number;
   adminCount: number;
 }> {
@@ -605,6 +618,7 @@ export async function getAdminStats(): Promise<{
     featuredCount: rows.filter((r) => r.featured).length,
     forSale: rows.filter((r) => r.status === "sale").length,
     forRent: rows.filter((r) => r.status === "rent").length,
+    sold: rows.filter((r) => r.status === "sold").length,
     totalUsers: roleRows.length,
     adminCount: roleRows.filter((r) => r.role === "admin").length,
   };

@@ -14,7 +14,6 @@ export default function Navbar() {
     { key: "buy", label: t("nav.buy"), href: "/" },
     { key: "rent", label: t("nav.rent"), href: "/" },
     { key: "sell", label: t("nav.sell"), href: "/" },
-    { key: "savedHomes", label: t("nav.savedHomes"), href: "/saved" },
   ];
   const [active, setActive] = useState(links[0].label);
   const [open, setOpen] = useState(false);
@@ -38,7 +37,7 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 border-b border-nordic/10 bg-clearday/95 backdrop-blur-md dark:border-white/5 dark:bg-[#0f231f]/95">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-20 items-center justify-between">
+        <div className="relative flex h-20 items-center justify-between">
           <Link
             href="/"
             aria-label={t("nav.homeAriaLabel")}
@@ -52,7 +51,7 @@ export default function Navbar() {
             </span>
           </Link>
 
-          <div className="hidden items-center space-x-8 md:flex">
+          <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 hidden items-center space-x-8 md:flex">
             {links.map((link) => (
               <Link
                 key={link.key}

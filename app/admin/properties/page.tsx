@@ -142,6 +142,7 @@ export default async function AdminPropertiesPage({
               errorDefault: t("admin.errorDefault"),
               sale: t("admin.form.sale"),
               rent: t("admin.form.rent"),
+              sold: t("admin.sold"),
               beds: t("propertyCard.beds"),
               baths: t("propertyCard.baths"),
               monthly: t("admin.monthly"),

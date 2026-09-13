@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import PropertyForm from "@/components/admin/PropertyForm";
+import { PROPERTY_AMENITIES } from "@/lib/amenities";
 import { getAdminPropertyById } from "@/lib/actions/admin";
 import { withMinDuration } from "@/lib/delay";
 import { getLocale } from "@/lib/i18n/server";
@@ -17,62 +18,87 @@ export default async function AdminEditPropertyPage({
   if (!property) notFound();
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold tracking-tight">{t("admin.editProperty")}</h1>
-      <p className="mt-1 mb-6 font-mono text-xs text-nordic/50 dark:text-gray-400">{id}</p>
-      <div className="rounded-2xl border border-nordic/10 bg-white p-5 shadow-soft sm:p-6 dark:border-white/10 dark:bg-white/5">
-        <PropertyForm
-          initial={property}
-          propertyId={id}
-          labels={{
-            id: t("admin.form.id"),
-            idHelp: t("admin.form.idHelp"),
-            title: t("admin.form.title"),
-            location: t("admin.form.location"),
-            address: t("admin.form.address"),
-            price: t("admin.form.price"),
-            priceSuffix: t("admin.form.priceSuffix"),
-            priceSuffixHelp: t("admin.form.priceSuffixHelp"),
-            type: t("admin.form.type"),
-            typeHouse: t("propertyType.House"),
-            typeApartment: t("propertyType.Apartment"),
-            typeVilla: t("propertyType.Villa"),
-            typePenthouse: t("propertyType.Penthouse"),
-            status: t("admin.form.status"),
-            sale: t("admin.form.sale"),
-            rent: t("admin.form.rent"),
-            beds: t("admin.form.beds"),
-            baths: t("admin.form.baths"),
-            area: t("admin.form.area"),
-            garage: t("admin.form.garage"),
-            image: t("admin.form.image"),
-            imageAlt: t("admin.form.imageAlt"),
-            tag: t("admin.form.tag"),
-            tagNone: t("admin.form.tagNone"),
-            tagExclusive: t("tag.Exclusive"),
-            tagNewArrival: t("tag.New Arrival"),
-            tagPremium: t("tag.Premium"),
-            tagNew: t("tag.New"),
-            featuredLabel: t("admin.form.featuredLabel"),
-            slug: t("admin.form.slug"),
-            slugHelp: t("admin.form.slugHelp"),
-            description: t("admin.form.description"),
-            amenities: t("admin.form.amenities"),
-            amenitiesHelp: t("admin.form.amenitiesHelp"),
-            lat: t("admin.form.lat"),
-            lng: t("admin.form.lng"),
-            extraImages: t("admin.form.extraImages"),
-            extraImagesHelp: t("admin.form.extraImagesHelp"),
-            save: t("admin.save"),
-            create: t("admin.create"),
-            cancel: t("admin.cancel"),
-            saving: t("admin.saving"),
-            propertyCreated: t("admin.propertyCreated"),
-            propertyUpdated: t("admin.propertyUpdated"),
-            errorDefault: t("admin.errorDefault"),
-          }}
-        />
-      </div>
-    </div>
+    <PropertyForm
+      initial={property}
+      propertyId={id}
+      labels={{
+        breadcrumbProperties: t("admin.properties"),
+        breadcrumbNew: t("admin.form.breadcrumbNew"),
+        breadcrumbEdit: t("admin.form.breadcrumbEdit"),
+        addTitle: t("admin.form.addTitle"),
+        editTitle: t("admin.form.editTitle"),
+        subtitle: t("admin.form.subtitle"),
+        saveDraft: t("admin.form.saveDraft"),
+        saveProperty: t("admin.form.saveProperty"),
+        basicInfo: t("admin.form.basicInfo"),
+        title: t("admin.form.title"),
+        titlePh: t("admin.form.titlePh"),
+        price: t("admin.form.price"),
+        pricePh: t("admin.form.pricePh"),
+        status: t("admin.form.status"),
+        sale: t("admin.form.sale"),
+        rent: t("admin.form.rent"),
+        sold: t("admin.sold"),
+        type: t("admin.form.type"),
+        typeHouse: t("propertyType.House"),
+        typeApartment: t("propertyType.Apartment"),
+        typeVilla: t("propertyType.Villa"),
+        typePenthouse: t("propertyType.Penthouse"),
+        description: t("admin.form.description"),
+        descriptionPh: t("admin.form.descriptionPh"),
+        characters: t("admin.form.characters"),
+        gallery: t("admin.form.gallery"),
+        locationT: t("admin.form.locationT"),
+        address: t("admin.form.address"),
+        addressPh: t("admin.form.addressPh"),
+        city: t("admin.form.location"),
+        cityPh: t("admin.form.cityPh"),
+        mapPreview: t("admin.form.mapPreview"),
+        locating: t("admin.form.locating"),
+        details: t("admin.form.details"),
+        area: t("admin.form.area"),
+        yearBuilt: t("admin.form.yearBuilt"),
+        yearPh: t("admin.form.yearPh"),
+        bedrooms: t("admin.form.bedrooms"),
+        bathrooms: t("admin.form.bathrooms"),
+        parking: t("admin.form.parking"),
+        decrease: t("admin.form.decrease"),
+        increase: t("admin.form.increase"),
+        amenitiesTitle: t("admin.form.amenitiesTitle"),
+        amenities: t("admin.form.amenities"),
+        amenitiesHelp: t("admin.form.amenitiesHelp"),
+        amenityOptions: PROPERTY_AMENITIES.map((value) => ({
+          value,
+          label: t(`amenity.${value}`),
+        })),
+        tag: t("admin.form.tag"),
+        tagNone: t("admin.form.tagNone"),
+        tagExclusive: t("tag.Exclusive"),
+        tagNewArrival: t("tag.New Arrival"),
+        tagPremium: t("tag.Premium"),
+        tagNew: t("tag.New"),
+        priceSuffix: t("admin.form.priceSuffix"),
+        priceSuffixHelp: t("admin.form.priceSuffixHelp"),
+        featuredLabel: t("admin.form.featuredLabel"),
+        lat: t("admin.form.lat"),
+        lng: t("admin.form.lng"),
+        dropTitle: t("admin.form.dropTitle"),
+        dropHint: t("admin.form.dropHint"),
+        formats: t("admin.form.formats"),
+        main: t("admin.form.main"),
+        deleteImage: t("admin.form.deleteImage"),
+        setMain: t("admin.form.setMain"),
+        addMore: t("admin.form.addMore"),
+        invalidType: t("admin.form.invalidType"),
+        tooLarge: t("admin.form.tooLarge"),
+        uploadFailed: t("admin.errorDefault"),
+        cancel: t("admin.cancel"),
+        saving: t("admin.saving"),
+        imageRequired: t("admin.form.imageRequired"),
+        propertyCreated: t("admin.propertyCreated"),
+        propertyUpdated: t("admin.propertyUpdated"),
+        errorDefault: t("admin.errorDefault"),
+      }}
+    />
   );
 }

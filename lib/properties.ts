@@ -213,6 +213,7 @@ export const getFeaturedProperties = cache(
       .from("properties")
       .select("*")
       .eq("featured", true)
+      .neq("status", "sold")
       .order("created_at", { ascending: false })
       .limit(2);
 
@@ -271,6 +272,7 @@ export const getPaginatedProperties = cache(
         switch (key) {
           case "status":
             if (value !== "all") q = q.eq("status", value);
+            else q = q.neq("status", "sold");
             break;
           case "city":
             if (typeof value === "string" && value.trim() !== "") {

@@ -16,6 +16,7 @@ export interface PropertyCardLabels {
   beds: string;
   baths: string;
   monthly: string;
+  sold: string;
 }
 
 function formatPrice(value: number): string {
@@ -37,6 +38,7 @@ export default function PropertyCard({
   labels: PropertyCardLabels;
 }) {
   const isSale = p.status === "sale";
+  const isSold = p.status === "sold";
   const addressLine = [p.address, p.location].filter(Boolean).join(", ");
 
   return (
@@ -108,13 +110,15 @@ export default function PropertyCard({
           className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium ${
             isSale
               ? "border-mosque/10 bg-hint text-mosque"
-              : "border-nordic/10 bg-nordic/5 text-nordic/60 dark:border-white/10 dark:bg-white/10 dark:text-gray-300"
+              : isSold
+                ? "border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-400"
+                : "border-nordic/10 bg-nordic/5 text-nordic/60 dark:border-white/10 dark:bg-white/10 dark:text-gray-300"
           }`}
         >
           <span
-            className={`mr-1.5 h-1.5 w-1.5 rounded-full ${isSale ? "bg-mosque" : "bg-nordic/40 dark:bg-gray-500"}`}
+            className={`mr-1.5 h-1.5 w-1.5 rounded-full ${isSale ? "bg-mosque" : isSold ? "bg-red-500" : "bg-nordic/40 dark:bg-gray-500"}`}
           />
-          {isSale ? labels.sale : labels.rent}
+          {isSale ? labels.sale : isSold ? labels.sold : labels.rent}
         </span>
       </div>
 
