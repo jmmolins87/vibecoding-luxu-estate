@@ -1,12 +1,11 @@
 import Icon from "@/components/ui/Icon";
-import { featuredProperties } from "@/data/properties";
 import type { Property } from "@/types/property";
 import FeaturedCard from "@/components/home/FeaturedCard";
 
 export default function FeaturedCollections({
-  properties = featuredProperties,
+  properties,
 }: {
-  properties?: Property[];
+  properties: Property[];
 }) {
   return (
     <section className="mb-16">

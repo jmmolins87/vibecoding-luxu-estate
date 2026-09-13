@@ -38,6 +38,7 @@ interface PropertyRow {
 
 function mapRowToProperty(row: PropertyRow): Property {
   // Solo arrays: la foto principal es siempre `images[0]`.
+  // Las imágenes SIEMPRE vienen de la BD (no se generan en código).
   const images = row.images && row.images.length > 0 ? row.images : [];
   const imagesAlt =
     row.images_alt && row.images_alt.length > 0
@@ -86,6 +87,57 @@ export interface PaginatedProperties {
   status: PropertyStatusFilter;
   filters: PropertyFilters;
   fromSupabase: boolean;
+}
+
+/**
+ * URL placeholder determinista para una propiedad (la misma que tienen
+ * `data/properties.ts` y la migración 005). Solo se usa para sustituir
+ * imágenes que la BD comparte entre propiedades.
+ */
+function placeholderUrl(id: string, index: number): string {
+  return `https://picsum.photos/seed/${id}-${index + 1}/1200/800`;
+}
+
+/**
+ * Cuenta cuántas propiedades de la BD comparten cada URL de imagen.
+ * Cached por request: es la baseline para decidir qué imágenes repetir.
+ */
+const getStoredImageUsage = cache(
+  async (): Promise<Map<string, number>> => {
+    const supabase = createServerSupabaseClient();
+    if (!supabase) return new Map();
+
+    const { data, error } = await supabase.from("properties").select("images");
+    if (error || !data) return new Map();
+
+    const usage = new Map<string, number>();
+    for (const row of data) {
+      for (const url of (row as { images?: string[] | null }).images ?? []) {
+        usage.set(url, (usage.get(url) ?? 0) + 1);
+      }
+    }
+    return usage;
+  },
+);
+
+/**
+ * Garantiza que NINGUNA imagen se repita entre propiedades:
+ * conserva los URLs únicos de la BD y sustituye solo los duplicados
+ * (compartidos con otra propiedad o repetidos dentro de la misma) por
+ * el placeholder determinista de esa propiedad. Mutación in situ.
+ */
+function dedupeImages(properties: Property[], usage: Map<string, number>): void {
+  for (const p of properties) {
+    const seen = new Set<string>();
+    p.images = p.images.map((url, i) => {
+      const shared = (usage.get(url) ?? 0) > 1;
+      if (!shared && !seen.has(url)) {
+        seen.add(url);
+        return url;
+      }
+      return placeholderUrl(p.id, i);
+    });
+  }
 }
 
 /** Aplica los filtros de búsqueda sobre datos locales (fallback sin Supabase). */
@@ -148,22 +200,29 @@ function paginateLocal(
 
 /**
  * Lee las destacadas en el SERVIDOR (Server Component).
+ * Siempre máximo 2 (aunque haya más en la BD).
  * Si no hay credenciales de Supabase, usa los datos locales.
  */
 export const getFeaturedProperties = cache(
   async (): Promise<{ properties: Property[]; fromSupabase: boolean }> => {
     const supabase = createServerSupabaseClient();
-    if (!supabase) return { properties: featuredProperties, fromSupabase: false };
+    if (!supabase)
+      return { properties: featuredProperties.slice(0, 2), fromSupabase: false };
 
     const { data, error } = await supabase
       .from("properties")
       .select("*")
       .eq("featured", true)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(2);
 
-    if (error || !data) return { properties: featuredProperties, fromSupabase: false };
+    if (error || !data)
+      return { properties: featuredProperties.slice(0, 2), fromSupabase: false };
 
-    return { properties: (data as PropertyRow[]).map(mapRowToProperty), fromSupabase: true };
+    const properties = (data as PropertyRow[]).map(mapRowToProperty);
+    const usage = await getStoredImageUsage();
+    dedupeImages(properties, usage);
+    return { properties, fromSupabase: true };
   },
 );
 
@@ -268,10 +327,14 @@ export const getPaginatedProperties = cache(
     const { data, error } = await buildFiltered(dataBase);
     if (error || !data) return paginateLocal(requestedPage, pageSize, filters);
 
+    const properties = (data as PropertyRow[]).map((row) =>
+      completeWithLocal(row, mapRowToProperty(row)),
+    );
+    const usage = await getStoredImageUsage();
+    dedupeImages(properties, usage);
+
     return {
-      properties: (data as PropertyRow[]).map((row) =>
-        completeWithLocal(row, mapRowToProperty(row)),
-      ),
+      properties,
       total,
       totalPages,
       page,
@@ -343,7 +406,10 @@ export const getPropertyBySlug = cache(
 
     if (!error && data) {
       const row = data as PropertyRow;
-      return completeWithLocal(row, mapRowToProperty(row));
+      const property = completeWithLocal(row, mapRowToProperty(row));
+      const usage = await getStoredImageUsage();
+      dedupeImages([property], usage);
+      return property;
     }
 
     // Fallback por id (BD sin columna slug) y luego datos locales.
@@ -354,7 +420,10 @@ export const getPropertyBySlug = cache(
       .maybeSingle();
     if (!byId.error && byId.data) {
       const row = byId.data as PropertyRow;
-      return completeWithLocal(row, mapRowToProperty(row));
+      const property = completeWithLocal(row, mapRowToProperty(row));
+      const usage = await getStoredImageUsage();
+      dedupeImages([property], usage);
+      return property;
     }
 
     return findLocalBySlug(slug);

@@ -1,21 +1,51 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Icon from "@/components/ui/Icon";
 import { categoryFilters } from "@/data/properties";
 import FilterModal from "@/components/home/FilterModal";
 import FilterChips from "@/components/home/FilterChips";
-import { countActiveFilters, type PropertyFilters } from "@/lib/filters";
+import {
+  buildSearchParams,
+  countActiveFilters,
+  type PropertyFilters,
+} from "@/lib/filters";
+import type { PropertyType } from "@/types/property";
 
 interface HeroSearchProps {
   filters: PropertyFilters;
   total: number;
 }
 
+/** Navega a la home con los filtros dados (fuente única de verdad = URL). */
+function pushFilters(
+  router: ReturnType<typeof useRouter>,
+  filters: PropertyFilters,
+  patch: Partial<PropertyFilters>,
+) {
+  const qs = buildSearchParams({ ...filters, ...patch });
+  router.push(qs ? `/?${qs}#market` : "/#market");
+}
+
 export default function HeroSearch({ filters, total }: HeroSearchProps) {
-  const [category, setCategory] = useState<string>("All");
+  const router = useRouter();
+  const [query, setQuery] = useState(filters.city ?? "");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const activeCount = countActiveFilters(filters);
+  const activeCategory = filters.type ?? "All";
+
+  const submitSearch = () => {
+    const city = query.trim() || undefined;
+    if (city === filters.city) return; // sin cambios → no navegar
+    pushFilters(router, filters, { city });
+  };
+
+  const selectCategory = (c: (typeof categoryFilters)[number]) => {
+    const type = c === "All" ? undefined : (c as PropertyType);
+    if (type === filters.type) return; // sin cambios → no navegar
+    pushFilters(router, filters, { type });
+  };
 
   return (
     <section className="py-12 md:py-16">
@@ -38,10 +68,19 @@ export default function HeroSearch({ filters, total }: HeroSearchProps) {
           </div>
           <input
             type="text"
+            // key: re-sincroniza con la URL si la ciudad cambia desde
+            // fuera (ej. quitar el chip ✕); al escribir no remonta.
+            key={`hero-search-${filters.city ?? "all"}`}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && submitSearch()}
             placeholder="Search by city, neighborhood, or address..."
             className="block w-full rounded-xl border-none bg-white py-4 pr-4 pl-12 text-lg text-nordic shadow-soft transition-all placeholder-nordic-muted/60 focus:bg-white focus:ring-2 focus:ring-mosque dark:bg-white/5 dark:text-white dark:focus:bg-white/10"
           />
-          <button className="absolute inset-y-2 right-2 flex items-center justify-center rounded-lg bg-mosque px-6 font-medium text-white shadow-lg shadow-mosque/20 transition-colors hover:bg-mosque/90">
+          <button
+            onClick={submitSearch}
+            className="absolute inset-y-2 right-2 flex items-center justify-center rounded-lg bg-mosque px-6 font-medium text-white shadow-lg shadow-mosque/20 transition-colors hover:bg-mosque/90"
+          >
             Search
           </button>
         </div>
@@ -50,9 +89,9 @@ export default function HeroSearch({ filters, total }: HeroSearchProps) {
           {categoryFilters.map((filter) => (
             <button
               key={filter}
-              onClick={() => setCategory(filter)}
+              onClick={() => selectCategory(filter)}
               className={
-                category === filter
+                activeCategory === filter
                   ? "rounded-full bg-nordic px-5 py-2 text-sm font-medium whitespace-nowrap text-white shadow-lg shadow-nordic/10 transition-transform hover:-translate-y-0.5"
                   : "rounded-full border border-nordic/5 bg-white px-5 py-2 text-sm font-medium whitespace-nowrap text-nordic-muted transition-all hover:border-mosque/50 hover:bg-mosque/5 hover:text-nordic dark:bg-white/5"
               }

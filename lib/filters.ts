@@ -127,6 +127,32 @@ export function formatPriceShort(n: number): string {
   return `$${n}`;
 }
 
+/** `true` si hay algún filtro o búsqueda aplicado (oculta las featured). */
+export function hasActiveFilters(f: PropertyFilters): boolean {
+  const entries = Object.entries(f) as [keyof PropertyFilters, unknown][];
+  for (const [key, value] of entries) {
+    switch (key) {
+      case "city":
+      case "type":
+        if (typeof value === "string" && value !== "") return true;
+        break;
+      case "beds":
+      case "baths":
+      case "minPrice":
+      case "maxPrice":
+        if (typeof value === "number") return true;
+        break;
+      case "amenities":
+        if (Array.isArray(value) && value.length > 0) return true;
+        break;
+      case "status":
+        if (value === "sale" || value === "rent") return true;
+        break;
+    }
+  }
+  return false;
+}
+
 /** Nº de filtros activos (para el badge del botón Filters). */
 export function countActiveFilters(f: PropertyFilters): number {
   const entries = Object.entries(f) as [keyof PropertyFilters, unknown][];

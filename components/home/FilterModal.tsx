@@ -38,6 +38,8 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
   const [draft, setDraft] = useState<PropertyFilters>({});
   const [wasOpen, setWasOpen] = useState(false);
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const draggingEdge = useRef<"min" | "max" | null>(null);
 
   // Sincroniza el borrador con la URL al abrir (ajuste durante el render,
   // patrón recomendado frente a setState dentro de un effect).
@@ -119,6 +121,50 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
     return raw.trim() === "" || !Number.isFinite(n) ? undefined : n;
   };
 
+  // Convierte el X del puntero (px) dentro del track a dólares.
+  const dollarsFromClientX = (clientX: number): number => {
+    const rect = trackRef.current?.getBoundingClientRect();
+    if (!rect) return 0;
+    const pct = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+    return Math.round(pct * SLIDER_MAX);
+  };
+
+  const setMinFromSlider = (v: number) => {
+    const max = draft.maxPrice ?? SLIDER_MAX;
+    const clamped = Math.min(v, max);
+    update({ minPrice: clamped === 0 ? undefined : clamped }, false);
+  };
+
+  const setMaxFromSlider = (v: number) => {
+    const min = draft.minPrice ?? 0;
+    const clamped = Math.max(v, min);
+    update({ maxPrice: clamped >= SLIDER_MAX ? undefined : clamped }, false);
+  };
+
+  const slideEdge = (edge: "min" | "max", v: number) =>
+    edge === "min" ? setMinFromSlider(v) : setMaxFromSlider(v);
+
+  // Todo el track es arrastrable: al pulsar mueve el thumb más cercano.
+  const trackPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    const v = dollarsFromClientX(e.clientX);
+    const minV = draft.minPrice ?? 0;
+    const maxV = draft.maxPrice ?? SLIDER_MAX;
+    draggingEdge.current =
+      Math.abs(v - minV) <= Math.abs(v - maxV) ? "min" : "max";
+    e.currentTarget.setPointerCapture(e.pointerId);
+    slideEdge(draggingEdge.current, v);
+  };
+
+  const trackPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!draggingEdge.current) return;
+    slideEdge(draggingEdge.current, dollarsFromClientX(e.clientX));
+  };
+
+  const trackPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    draggingEdge.current = null;
+    e.currentTarget.releasePointerCapture?.(e.pointerId);
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -179,8 +225,17 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
               </label>
               <span className="text-sm font-medium text-mosque">{rangeLabel}</span>
             </div>
-            <div className="relative mb-6 flex h-12 items-center px-2">
-              <div className="absolute w-full overflow-hidden rounded-full bg-nordic/10">
+            <div
+              ref={trackRef}
+              role="group"
+              aria-label="Price range"
+              onPointerDown={trackPointerDown}
+              onPointerMove={trackPointerMove}
+              onPointerUp={trackPointerUp}
+              onPointerCancel={trackPointerUp}
+              className="relative mb-6 flex h-12 cursor-pointer touch-none items-center px-2 select-none"
+            >
+              <div className="pointer-events-none absolute w-full overflow-hidden rounded-full bg-nordic/10">
                 <div
                   className="h-1 bg-mosque"
                   style={{
@@ -189,14 +244,8 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
                   }}
                 />
               </div>
-              <div
-                className="absolute z-10 -ml-3 h-6 w-6 rounded-full border-2 border-mosque bg-white shadow-md"
-                style={{ left: `${minPct}%` }}
-              />
-              <div
-                className="absolute z-10 -ml-3 h-6 w-6 rounded-full border-2 border-mosque bg-white shadow-md"
-                style={{ left: `${maxPct}%` }}
-              />
+              <RangeThumb ariaLabel="Minimum price" valuePct={minPct} />
+              <RangeThumb ariaLabel="Maximum price" valuePct={maxPct} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="rounded-lg bg-clearday p-3 transition-colors focus-within:border-mosque/30 dark:bg-white/5">
@@ -362,6 +411,27 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
         </footer>
       </main>
     </div>
+  );
+}
+
+/** Thumb visual del rango. La interacción vive en el track (padre). */
+function RangeThumb({
+  ariaLabel,
+  valuePct,
+}: {
+  ariaLabel: string;
+  valuePct: number;
+}) {
+  return (
+    <div
+      role="slider"
+      aria-label={ariaLabel}
+      aria-valuemin={0}
+      aria-valuemax={SLIDER_MAX}
+      aria-valuenow={Math.round((valuePct / 100) * SLIDER_MAX)}
+      className="pointer-events-none absolute z-10 -ml-3 h-6 w-6 cursor-pointer rounded-full border-2 border-mosque bg-white shadow-md transition-colors select-none hover:bg-mosque hover:border-white"
+      style={{ left: `${valuePct}%` }}
+    />
   );
 }
 

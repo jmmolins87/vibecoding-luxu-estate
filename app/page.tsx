@@ -4,7 +4,7 @@ import {
   getFeaturedProperties,
   getPaginatedProperties,
 } from "@/lib/properties";
-import { parseFilters } from "@/lib/filters";
+import { parseFilters, hasActiveFilters } from "@/lib/filters";
 
 interface HomeSearchParams {
   page?: string;
@@ -35,8 +35,11 @@ export default async function Home({
     params as Record<string, string | undefined>,
   );
 
-  const [{ properties: featured }, market] = await Promise.all([
-    getFeaturedProperties(),
+  // Con filtros/búsqueda activos no se muestran las featured (confunden al usuario).
+  const showFeatured = !hasActiveFilters(filters);
+
+  const [featuredResult, market] = await Promise.all([
+    showFeatured ? getFeaturedProperties() : Promise.resolve(null),
     getPaginatedProperties({
       page: Number.isFinite(page) ? page : 1,
       pageSize: DEFAULT_PAGE_SIZE,
@@ -44,5 +47,11 @@ export default async function Home({
     }),
   ]);
 
-  return <HomeScreen featured={featured} market={market} filters={filters} />;
+  return (
+    <HomeScreen
+      featured={featuredResult?.properties ?? []}
+      market={market}
+      filters={filters}
+    />
+  );
 }

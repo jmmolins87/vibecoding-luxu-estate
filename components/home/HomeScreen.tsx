@@ -22,7 +22,7 @@ export default function HomeScreen({ featured, market, filters }: HomeScreenProp
       <Navbar />
       <main className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
         <HeroSearch filters={filters} total={market.total} />
-        <FeaturedCollections properties={featured} />
+        {featured.length > 0 && <FeaturedCollections properties={featured} />}
         <MarketSection data={market} filters={filters} />
       </main>
     </div>
