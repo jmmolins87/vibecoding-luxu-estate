@@ -1,21 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Icon from "@/components/ui/Icon";
 import LanguageSelector from "@/components/ui/LanguageSelector";
+import { getAvatarUrl, getDisplayName, useAuth } from "@/lib/auth/AuthProvider";
 import { useTranslations } from "@/lib/i18n/client";
 
 export default function Navbar() {
   const { t } = useTranslations();
+  const { user, isLoading, openLogin, signOut } = useAuth();
   const links = [
-    { key: "buy", label: t("nav.buy") },
-    { key: "rent", label: t("nav.rent") },
-    { key: "sell", label: t("nav.sell") },
-    { key: "savedHomes", label: t("nav.savedHomes") },
+    { key: "buy", label: t("nav.buy"), href: "/" },
+    { key: "rent", label: t("nav.rent"), href: "/" },
+    { key: "sell", label: t("nav.sell"), href: "/" },
+    { key: "savedHomes", label: t("nav.savedHomes"), href: "/saved" },
   ];
   const [active, setActive] = useState(links[0].label);
   const [open, setOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const avatarUrl = getAvatarUrl(user);
+  const displayName = getDisplayName(user);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onClick = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [menuOpen]);
 
   return (
     <nav className="sticky top-0 z-50 border-b border-nordic/10 bg-clearday/95 backdrop-blur-md dark:border-white/5 dark:bg-[#0f231f]/95">
@@ -36,13 +54,10 @@ export default function Navbar() {
 
           <div className="hidden items-center space-x-8 md:flex">
             {links.map((link) => (
-              <a
+              <Link
                 key={link.key}
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setActive(link.label);
-                }}
+                href={link.href}
+                onClick={() => setActive(link.label)}
                 className={
                   active === link.label
                     ? "border-b-2 border-mosque px-1 py-1 text-sm font-medium text-mosque"
@@ -50,7 +65,7 @@ export default function Navbar() {
                 }
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -69,19 +84,89 @@ export default function Navbar() {
               <span className="absolute top-0 right-0 h-2 w-2 rounded-full border-2 border-clearday bg-red-500 dark:border-[#0f231f]" />
             </button>
             <div className="flex gap-2 border-l border-nordic/10 pl-2 dark:border-white/10">
-              <LanguageSelector />
+            <LanguageSelector />
+            {isLoading ? (
+              <span className="ml-2 h-9 w-9 animate-pulse rounded-full bg-nordic/10 pl-2 dark:bg-white/10" />
+            ) : user ? (
+              <div ref={menuRef} className="relative ml-2 border-l border-nordic/10 pl-2 dark:border-white/10">
+                <button
+                  aria-label={t("nav.profile")}
+                  aria-haspopup="menu"
+                  aria-expanded={menuOpen}
+                  onClick={() => setMenuOpen((v) => !v)}
+                  className="flex items-center gap-2"
+                >
+                  <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-mosque font-semibold text-white ring-2 ring-transparent transition-all hover:ring-mosque">
+                    {avatarUrl ? (
+                      <img
+                        alt={displayName || t("nav.profile")}
+                        className="h-full w-full object-cover"
+                        src={avatarUrl}
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <span aria-hidden="true">
+                        {(displayName || "U").charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                  </span>
+                </button>
+                {menuOpen && (
+                  <div
+                    role="menu"
+                    className="absolute right-0 mt-2 w-60 overflow-hidden rounded-xl border border-nordic/10 bg-white shadow-soft dark:border-white/10 dark:bg-[#0f231f]"
+                  >
+                    <div className="border-b border-nordic/10 px-4 py-3 dark:border-white/10">
+                      <p className="truncate text-sm font-semibold text-nordic dark:text-white">
+                        {displayName || t("nav.account")}
+                      </p>
+                      {user.email && (
+                        <p className="truncate text-xs text-nordic/60 dark:text-gray-400">
+                          {user.email}
+                        </p>
+                      )}
+                    </div>
+                    <div className="p-1.5">
+                      <Link
+                        href="/saved"
+                        role="menuitem"
+                        onClick={() => setMenuOpen(false)}
+                        className="block rounded-lg px-3 py-2 text-sm text-nordic transition-colors hover:bg-nordic/5 dark:text-gray-200 dark:hover:bg-white/10"
+                      >
+                        {t("nav.savedHomes")}
+                      </Link>
+                      <button
+                        type="button"
+                        role="menuitem"
+                        onClick={() => setMenuOpen(false)}
+                        className="block w-full rounded-lg px-3 py-2 text-left text-sm text-nordic transition-colors hover:bg-nordic/5 dark:text-gray-200 dark:hover:bg-white/10"
+                      >
+                        {t("nav.settings")}
+                      </button>
+                      <button
+                        type="button"
+                        role="menuitem"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          signOut();
+                        }}
+                        className="block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-red-600 transition-colors hover:bg-red-500/10 dark:text-red-400"
+                      >
+                        {t("nav.signOut")}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
               <button
-                aria-label={t("nav.profile")}
-                className="ml-2 flex items-center gap-2 "
+                type="button"
+                onClick={() => openLogin()}
+                className="ml-2 rounded-lg bg-mosque px-4 py-2 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-mosque/90 hover:shadow-soft"
               >
-                <span className="h-9 w-9 overflow-hidden rounded-full bg-gray-200 ring-2 ring-transparent transition-all hover:ring-mosque">
-                  <img
-                    alt={t("nav.profile")}
-                    className="h-full w-full object-cover"
-                    src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80"
-                  />
-                </span>
+                {t("nav.signIn")}
               </button>
+            )}
             </div> 
             <button
               aria-label={t("nav.menu")}
@@ -103,11 +188,10 @@ export default function Navbar() {
       >
         <div className="space-y-1 px-4 py-2">
           {links.map((link) => (
-            <a
+            <Link
               key={link.key}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
+              href={link.href}
+              onClick={() => {
                 setActive(link.label);
                 setOpen(false);
               }}
@@ -118,8 +202,32 @@ export default function Navbar() {
               }
             >
               {link.label}
-            </a>
+            </Link>
           ))}
+          {!isLoading &&
+            (user ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  signOut();
+                }}
+                className="block w-full rounded-md px-3 py-2 text-left text-base font-medium text-red-600 dark:text-red-400"
+              >
+                {t("nav.signOut")}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  openLogin();
+                }}
+                className="mt-1 block w-full rounded-lg bg-mosque px-3 py-2 text-left text-base font-medium text-white"
+              >
+                {t("nav.signIn")}
+              </button>
+            ))}
         </div>
       </div>
     </nav>

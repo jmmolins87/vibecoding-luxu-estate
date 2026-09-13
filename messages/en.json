@@ -20,7 +20,11 @@
     "notifications": "Notifications",
     "menu": "Menu",
     "profile": "Profile",
-    "homeAriaLabel": "LuxeEstate home"
+    "homeAriaLabel": "LuxeEstate home",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "settings": "Settings",
+    "account": "Account"
   },
   "hero": {
     "findYour": "Find your",
@@ -152,6 +156,36 @@
     "New Arrival": "New Arrival",
     "Premium": "Premium",
     "New": "New"
+  },
+  "auth": {
+    "welcome": "Welcome to LuxeEstate",
+    "subtitle": "Unlock exclusive properties worldwide.",
+    "google": "Continue with Google",
+    "github": "Continue with GitHub",
+    "or": "or",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "passwordPlaceholder": "••••••••",
+    "passwordMin": "Minimum 6 characters",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "signingIn": "Signing in…",
+    "signingUp": "Creating account…",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "close": "Close login dialog",
+    "checkEmail": "Account created. Check your email to confirm it.",
+    "loginRequired": "Sign in required",
+    "loginRequiredDesc": "Sign in to see your saved homes.",
+    "errorDefault": "Something went wrong. Please try again."
+  },
+  "saved": {
+    "title": "Saved Homes",
+    "subtitle": "Your shortlist, synced with your account.",
+    "emptyTitle": "No saved homes yet",
+    "emptyDesc": "Tap the heart on any property to keep it here.",
+    "browse": "Browse properties"
   },
   "language": {
     "selector": "Language",

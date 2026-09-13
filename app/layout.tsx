@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import { getLocale } from "@/lib/i18n/server";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { I18nProvider } from "@/lib/i18n/client";
+import { AuthProvider } from "@/lib/auth/AuthProvider";
+import AuthModalHost from "@/components/auth/AuthModalHost";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -21,7 +24,12 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     <html lang={locale} className="h-full antialiased">
       <body className="flex min-h-full flex-col">
         <I18nProvider locale={locale} dict={dict}>
-          {children}
+          <AuthProvider>
+            {children}
+            <Suspense>
+              <AuthModalHost />
+            </Suspense>
+          </AuthProvider>
         </I18nProvider>
       </body>
     </html>

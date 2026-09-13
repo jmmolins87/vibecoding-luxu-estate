@@ -20,7 +20,11 @@
     "notifications": "Notifications",
     "menu": "Menu",
     "profile": "Profil",
-    "homeAriaLabel": "Accueil LuxeEstate"
+    "homeAriaLabel": "Accueil LuxeEstate",
+    "signIn": "Se connecter",
+    "signOut": "Se déconnecter",
+    "settings": "Paramètres",
+    "account": "Compte"
   },
   "hero": {
     "findYour": "Trouvez votre",
@@ -152,6 +156,36 @@
     "New Arrival": "Nouveauté",
     "Premium": "Premium",
     "New": "Nouveau"
+  },
+  "auth": {
+    "welcome": "Bienvenue sur LuxeEstate",
+    "subtitle": "Découvrez des biens exclusifs dans le monde entier.",
+    "google": "Continuer avec Google",
+    "github": "Continuer avec GitHub",
+    "or": "ou",
+    "email": "E-mail",
+    "emailPlaceholder": "vous@exemple.com",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "••••••••",
+    "passwordMin": "6 caractères minimum",
+    "signIn": "Se connecter",
+    "signUp": "S'inscrire",
+    "signingIn": "Connexion…",
+    "signingUp": "Création du compte…",
+    "noAccount": "Pas encore de compte ?",
+    "hasAccount": "Déjà un compte ?",
+    "close": "Fermer la boîte de connexion",
+    "checkEmail": "Compte créé. Vérifiez votre e-mail pour le confirmer.",
+    "loginRequired": "Connexion requise",
+    "loginRequiredDesc": "Connectez-vous pour voir vos favoris.",
+    "errorDefault": "Une erreur est survenue. Réessayez."
+  },
+  "saved": {
+    "title": "Favoris",
+    "subtitle": "Votre sélection, synchronisée avec votre compte.",
+    "emptyTitle": "Aucun favori pour l'instant",
+    "emptyDesc": "Touchez le cœur d'un bien pour le garder ici.",
+    "browse": "Parcourir les biens"
   },
   "language": {
     "selector": "Langue",

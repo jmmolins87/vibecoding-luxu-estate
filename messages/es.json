@@ -20,7 +20,11 @@
     "notifications": "Notificaciones",
     "menu": "Menú",
     "profile": "Perfil",
-    "homeAriaLabel": "Inicio de LuxeEstate"
+    "homeAriaLabel": "Inicio de LuxeEstate",
+    "signIn": "Iniciar sesión",
+    "signOut": "Cerrar sesión",
+    "settings": "Ajustes",
+    "account": "Cuenta"
   },
   "hero": {
     "findYour": "Encuentra tu",
@@ -152,6 +156,36 @@
     "New Arrival": "Novedad",
     "Premium": "Premium",
     "New": "Nuevo"
+  },
+  "auth": {
+    "welcome": "Bienvenido a LuxeEstate",
+    "subtitle": "Descubre propiedades exclusivas en todo el mundo.",
+    "google": "Continuar con Google",
+    "github": "Continuar con GitHub",
+    "or": "o",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "password": "Contraseña",
+    "passwordPlaceholder": "••••••••",
+    "passwordMin": "Mínimo 6 caracteres",
+    "signIn": "Iniciar sesión",
+    "signUp": "Registrarse",
+    "signingIn": "Iniciando sesión…",
+    "signingUp": "Creando cuenta…",
+    "noAccount": "¿No tienes cuenta?",
+    "hasAccount": "¿Ya tienes cuenta?",
+    "close": "Cerrar el diálogo de acceso",
+    "checkEmail": "Cuenta creada. Revisa tu correo para confirmarla.",
+    "loginRequired": "Inicia sesión",
+    "loginRequiredDesc": "Inicia sesión para ver tus guardados.",
+    "errorDefault": "Algo salió mal. Inténtalo de nuevo."
+  },
+  "saved": {
+    "title": "Guardados",
+    "subtitle": "Tu selección, sincronizada con tu cuenta.",
+    "emptyTitle": "Aún no tienes guardados",
+    "emptyDesc": "Toca el corazón de cualquier propiedad para guardarla aquí.",
+    "browse": "Explorar propiedades"
   },
   "language": {
     "selector": "Idioma",
