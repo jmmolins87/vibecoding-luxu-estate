@@ -9,7 +9,7 @@ import { useTranslations } from "@/lib/i18n/client";
 
 export default function Navbar() {
   const { t } = useTranslations();
-  const { user, isLoading, openLogin, signOut } = useAuth();
+  const { user, role, isLoading, openLogin, signOut } = useAuth();
   const links = [
     { key: "buy", label: t("nav.buy"), href: "/" },
     { key: "rent", label: t("nav.rent"), href: "/" },
@@ -127,6 +127,16 @@ export default function Navbar() {
                         )}
                       </div>
                       <div className="p-1.5">
+                        {role === "admin" && (
+                          <Link
+                            href="/admin"
+                            role="menuitem"
+                            onClick={() => setMenuOpen(false)}
+                            className="block rounded-lg px-3 py-2 text-sm font-medium text-mosque transition-colors hover:bg-mosque/10 dark:text-hint"
+                          >
+                            {t("nav.admin")}
+                          </Link>
+                        )}
                         <Link
                           href="/saved"
                           role="menuitem"
@@ -135,14 +145,6 @@ export default function Navbar() {
                         >
                           {t("nav.savedHomes")}
                         </Link>
-                        <button
-                          type="button"
-                          role="menuitem"
-                          onClick={() => setMenuOpen(false)}
-                          className="block w-full rounded-lg px-3 py-2 text-left text-sm text-nordic transition-colors hover:bg-nordic/5 dark:text-gray-200 dark:hover:bg-white/10"
-                        >
-                          {t("nav.settings")}
-                        </button>
                         <button
                           type="button"
                           role="menuitem"

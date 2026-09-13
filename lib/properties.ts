@@ -11,7 +11,7 @@ export const DEFAULT_PAGE_SIZE = 8;
 
 export type PropertyStatusFilter = "all" | PropertyStatus;
 
-interface PropertyRow {
+export interface PropertyRow {
   id: string;
   slug?: string | null;
   title: string;
@@ -36,7 +36,7 @@ interface PropertyRow {
   featured: boolean;
 }
 
-function mapRowToProperty(row: PropertyRow): Property {
+export function mapRowToProperty(row: PropertyRow): Property {
   // Solo arrays: la foto principal es siempre `images[0]`.
   // Las imágenes SIEMPRE vienen de la BD (no se generan en código).
   const images = row.images && row.images.length > 0 ? row.images : [];

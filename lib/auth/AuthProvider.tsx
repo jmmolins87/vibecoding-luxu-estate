@@ -13,12 +13,14 @@ import {
 import { useRouter } from "next/navigation";
 import type { Session, User } from "@supabase/supabase-js";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
+import type { UserRole } from "@/lib/auth/roles";
 
 export type OAuthProvider = "google" | "github";
 
 interface AuthContextValue {
   user: User | null;
   session: Session | null;
+  role: UserRole | null;
   isLoading: boolean;
   isLoginOpen: boolean;
   openLogin: (nextPath?: string) => void;
@@ -60,6 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [role, setRole] = useState<UserRole | null>(null);
   const [isLoading, setIsLoading] = useState(() => supabase !== null);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [pendingNext, setPendingNext] = useState<string | null>(null);
@@ -76,11 +79,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(data.session);
       setUser(data.session?.user ?? null);
       setIsLoading(false);
-    });
-    const { data: listener } = supabase.auth.onAuthStateChange(
+    });    const { data: listener } = supabase.auth.onAuthStateChange(
       (event, nextSession) => {
         setSession(nextSession);
         setUser(nextSession?.user ?? null);
+        if (event === "SIGNED_OUT") setRole(null);
         // Al iniciar sesión con el modal abierto: cierra y redirige al destino.
         if (event === "SIGNED_IN" && loginOpenRef.current) {
           loginOpenRef.current = false;
@@ -98,6 +101,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       listener.subscription.unsubscribe();
     };
   }, [supabase, router]);
+
+  // Rol del usuario actual (para mostrar el acceso a /admin). Se recarga
+  // con cada cambio de sesión; al cerrar sesión lo limpia el listener
+  // de onAuthStateChange (evento SIGNED_OUT).
+  useEffect(() => {
+    if (!session?.user) return;
+    let mounted = true;
+    fetch("/api/me/role", { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : { role: null }))
+      .then((data: { role: UserRole | null }) => {
+        if (mounted) setRole(data.role === "admin" ? "admin" : data.role === "user" ? "user" : null);
+      })
+      .catch(() => {
+        if (mounted) setRole(null);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [session]);
 
   const openLogin = useCallback((nextPath?: string) => {
     pendingNextRef.current = nextPath ?? null;
@@ -156,6 +178,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       user,
       session,
+      role,
       isLoading,
       isLoginOpen,
       openLogin,
@@ -168,6 +191,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [
       user,
       session,
+      role,
       isLoading,
       isLoginOpen,
       openLogin,

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import Icon from "@/components/ui/Icon";
 import { useAuth } from "@/lib/auth/AuthProvider";
+import { authErrorKey } from "@/lib/auth/errors";
 import { useTranslations } from "@/lib/i18n/client";
 
 type Mode = "signin" | "signup";
@@ -72,12 +73,12 @@ export default function LoginModal() {
     try {
       if (mode === "signin") {
         const { error: msg } = await signInWithEmail(email.trim(), password);
-        if (msg) setError(msg);
+        if (msg) setError(t(authErrorKey(msg)));
         else setPassword("");
         // Si OK, el AuthProvider cierra el modal al detectar la sesión.
       } else {
         const { error: msg, needsConfirmation } = await signUpWithEmail(email.trim(), password);
-        if (msg) setError(msg);
+        if (msg) setError(t(authErrorKey(msg)));
         else if (needsConfirmation) setInfo(t("auth.checkEmail"));
         // Si hay sesión inmediata, el AuthProvider cierra el modal.
       }
@@ -92,6 +93,111 @@ export default function LoginModal() {
     setMode(next);
     setError(null);
     setInfo(null);
+  }
+
+  function renderPanel(panelMode: Mode) {
+    const active = panelMode === mode;
+    const isSignup = panelMode === "signup";
+    return (
+      <section
+        key={panelMode}
+        aria-hidden={!active}
+        inert={!active}
+        className="w-1/2 shrink-0"
+      >
+        <div className="space-y-4">
+          <button type="button" onClick={() => signInWithOAuth("google")} className={socialBtn} tabIndex={active ? undefined : -1}>
+            <div className="absolute inset-0 translate-y-full bg-hint/20 transition-transform duration-300 ease-out group-hover:translate-y-0" />
+            <GoogleIcon />
+            <span className="relative z-10">{t("auth.google")}</span>
+          </button>
+          <button type="button" onClick={() => signInWithOAuth("github")} className={socialBtn} tabIndex={active ? undefined : -1}>
+            <div className="absolute inset-0 translate-y-full bg-hint/20 transition-transform duration-300 ease-out group-hover:translate-y-0" />
+            <GitHubIcon />
+            <span className="relative z-10">{t("auth.github")}</span>
+          </button>
+        </div>
+
+        <div className="my-6 flex items-center gap-3 text-xs text-nordic/50 dark:text-gray-500">
+          <span className="h-px flex-1 bg-nordic/10 dark:bg-white/10" />
+          {t("auth.or")}
+          <span className="h-px flex-1 bg-nordic/10 dark:bg-white/10" />
+        </div>
+
+        <form onSubmit={handleEmailSubmit} className="space-y-4">
+          <div>
+            <label htmlFor={`login-email-${panelMode}`} className="mb-1.5 block text-sm font-medium text-nordic dark:text-gray-200">
+              {t("auth.email")}
+            </label>
+            <input
+              id={`login-email-${panelMode}`}
+              type="email"
+              required
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder={t("auth.emailPlaceholder")}
+              className="w-full rounded-lg border border-nordic/10 bg-white px-4 py-3 text-sm text-nordic outline-none transition-all placeholder:text-nordic/30 focus:border-mosque focus:ring-2 focus:ring-mosque/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500"
+            />
+          </div>
+          <div>
+            <label htmlFor={`login-password-${panelMode}`} className="mb-1.5 block text-sm font-medium text-nordic dark:text-gray-200">
+              {t("auth.password")}
+            </label>
+            <input
+              id={`login-password-${panelMode}`}
+              type="password"
+              required
+              minLength={6}
+              autoComplete={isSignup ? "new-password" : "current-password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={t("auth.passwordPlaceholder")}
+              className="w-full rounded-lg border border-nordic/10 bg-white px-4 py-3 text-sm text-nordic outline-none transition-all placeholder:text-nordic/30 focus:border-mosque focus:ring-2 focus:ring-mosque/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500"
+            />
+            {isSignup && (
+              <p className="mt-1.5 text-xs text-nordic/50 dark:text-gray-500">{t("auth.passwordMin")}</p>
+            )}
+          </div>
+
+          {error && (
+            <p role="alert" className="rounded-lg bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-400">
+              {error}
+            </p>
+          )}
+          {info && (
+            <p role="status" className="rounded-lg bg-mosque/10 px-4 py-3 text-sm text-mosque dark:text-hint">
+              {info}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={busy}
+            className="w-full rounded-lg bg-mosque p-3.5 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-mosque/90 hover:shadow-soft disabled:translate-y-0 disabled:opacity-60"
+          >
+            {busy
+              ? isSignup
+                ? t("auth.signingUp")
+                : t("auth.signingIn")
+              : isSignup
+                ? t("auth.signUp")
+                : t("auth.signIn")}
+          </button>
+        </form>
+
+        <p className="mt-8 text-center text-sm text-nordic/70 dark:text-gray-400">
+          {isSignup ? t("auth.hasAccount") : t("auth.noAccount")}{" "}
+          <button
+            type="button"
+            onClick={() => switchMode(isSignup ? "signin" : "signup")}
+            className="font-semibold text-mosque transition-colors hover:text-nordic dark:text-hint dark:hover:text-white"
+          >
+            {isSignup ? t("auth.signIn") : t("auth.signUp")}
+          </button>
+        </p>
+      </section>
+    );
   }
 
   return (
@@ -132,97 +238,17 @@ export default function LoginModal() {
             <Icon name="close" className="h-5 w-5" />
           </button>
 
-          <div className="space-y-4">
-            <button type="button" onClick={() => signInWithOAuth("google")} className={socialBtn}>
-              <div className="absolute inset-0 translate-y-full bg-hint/20 transition-transform duration-300 ease-out group-hover:translate-y-0" />
-              <GoogleIcon />
-              <span className="relative z-10">{t("auth.google")}</span>
-            </button>
-            <button type="button" onClick={() => signInWithOAuth("github")} className={socialBtn}>
-              <div className="absolute inset-0 translate-y-full bg-hint/20 transition-transform duration-300 ease-out group-hover:translate-y-0" />
-              <GitHubIcon />
-              <span className="relative z-10">{t("auth.github")}</span>
-            </button>
-          </div>
-
-          <div className="my-6 flex items-center gap-3 text-xs text-nordic/50 dark:text-gray-500">
-            <span className="h-px flex-1 bg-nordic/10 dark:bg-white/10" />
-            {t("auth.or")}
-            <span className="h-px flex-1 bg-nordic/10 dark:bg-white/10" />
-          </div>
-
-          <form onSubmit={handleEmailSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="login-email" className="mb-1.5 block text-sm font-medium text-nordic dark:text-gray-200">
-                {t("auth.email")}
-              </label>
-              <input
-                id="login-email"
-                type="email"
-                required
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={t("auth.emailPlaceholder")}
-                className="w-full rounded-lg border border-nordic/10 bg-white px-4 py-3 text-sm text-nordic outline-none transition-all placeholder:text-nordic/30 focus:border-mosque focus:ring-2 focus:ring-mosque/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500"
-              />
-            </div>
-            <div>
-              <label htmlFor="login-password" className="mb-1.5 block text-sm font-medium text-nordic dark:text-gray-200">
-                {t("auth.password")}
-              </label>
-              <input
-                id="login-password"
-                type="password"
-                required
-                minLength={6}
-                autoComplete={mode === "signin" ? "current-password" : "new-password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder={t("auth.passwordPlaceholder")}
-                className="w-full rounded-lg border border-nordic/10 bg-white px-4 py-3 text-sm text-nordic outline-none transition-all placeholder:text-nordic/30 focus:border-mosque focus:ring-2 focus:ring-mosque/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500"
-              />
-              {mode === "signup" && (
-                <p className="mt-1.5 text-xs text-nordic/50 dark:text-gray-500">{t("auth.passwordMin")}</p>
-              )}
-            </div>
-
-            {error && (
-              <p role="alert" className="rounded-lg bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-400">
-                {error}
-              </p>
-            )}
-            {info && (
-              <p role="status" className="rounded-lg bg-mosque/10 px-4 py-3 text-sm text-mosque dark:text-hint">
-                {info}
-              </p>
-            )}
-
-            <button
-              type="submit"
-              disabled={busy}
-              className="w-full rounded-lg bg-mosque p-3.5 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-mosque/90 hover:shadow-soft disabled:translate-y-0 disabled:opacity-60"
+          {/* Pista deslizante [registro | acceso]: ir a registro desplaza el
+              contenido hacia la derecha; volver a acceso, hacia la izquierda. */}
+          <div className="overflow-hidden">
+            <div
+              className="flex w-[200%] motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-[cubic-bezier(0.32,0.72,0,1)]"
+              style={{ transform: mode === "signin" ? "translateX(-50%)" : "translateX(0)" }}
             >
-              {busy
-                ? mode === "signin"
-                  ? t("auth.signingIn")
-                  : t("auth.signingUp")
-                : mode === "signin"
-                  ? t("auth.signIn")
-                  : t("auth.signUp")}
-            </button>
-          </form>
-
-          <p className="mt-8 text-center text-sm text-nordic/70 dark:text-gray-400">
-            {mode === "signin" ? t("auth.noAccount") : t("auth.hasAccount")}{" "}
-            <button
-              type="button"
-              onClick={() => switchMode(mode === "signin" ? "signup" : "signin")}
-              className="font-semibold text-mosque transition-colors hover:text-nordic dark:text-hint dark:hover:text-white"
-            >
-              {mode === "signin" ? t("auth.signUp") : t("auth.signIn")}
-            </button>
-          </p>
+              {renderPanel("signup")}
+              {renderPanel("signin")}
+            </div>
+          </div>
         </div>
 
         <div className="mt-8 text-center">

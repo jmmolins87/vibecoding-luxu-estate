@@ -29,7 +29,7 @@ export default function FeaturedCard({ property }: FeaturedCardProps) {
             {t(`tag.${property.tag}` as string) !== `tag.${property.tag}` ? t(`tag.${property.tag}` as string) : property.tag}
           </div>
         )}
-        <SaveButton className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-nordic backdrop-blur-sm transition-all hover:bg-mosque hover:text-white dark:bg-black/60 dark:text-white" />
+        <SaveButton propertyId={property.id} className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-nordic backdrop-blur-sm transition-all hover:bg-mosque hover:text-white dark:bg-black/60 dark:text-white" />
         <div
           className={
             property.status === "rent"

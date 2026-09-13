@@ -26,6 +26,23 @@ export function isSupabaseConfigured(): boolean {
 }
 
 /**
+ * Cliente Supabase con SERVICE ROLE para usar SOLO en el servidor
+ * (Server Actions de administración). Omite RLS: cada llamada debe
+ * verificar antes que el usuario actual es admin (ver `lib/auth/roles.ts`).
+ * Requiere `SUPABASE_SERVICE_ROLE_KEY` en el entorno (nunca exponer al cliente).
+ */
+export function createServiceSupabaseClient(): SupabaseClient | null {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!url || !serviceKey) return null;
+
+  return createClient(url, serviceKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
+
+/**
  * Cliente Supabase con cookies para flujos de AUTENTICACIÓN en el servidor
  * (Route Handlers, Server Components protegidos, proxy/middleware).
  * Comparte la sesión con el cliente del navegador.

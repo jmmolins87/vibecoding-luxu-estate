@@ -1,14 +1,19 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { COOKIE_MAX_AGE, COOKIE_NAME, defaultLocale, isValidLocale } from "@/lib/i18n/config";
+import { ADMIN_ROLE } from "@/lib/auth/roles";
 
 /** Rutas que exigen sesión: redirigen a `/?login=required&next=...`. */
 const PROTECTED_PREFIXES = ["/saved"];
 
-function isProtected(pathname: string): boolean {
-  return PROTECTED_PREFIXES.some(
+/** Rutas que exigen rol `admin`: sin sesión van al login, sin rol van a `/`. */
+const ADMIN_PREFIXES = ["/admin"];
+
+function matches(pathname: string, prefixes: string[]): string | null {
+  const hit = prefixes.find(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
+  return hit ?? null;
 }
 
 export async function proxy(request: NextRequest) {
@@ -50,7 +55,7 @@ export async function proxy(request: NextRequest) {
 
     // --- Rutas protegidas con redirección al login modal ---
     const pathname = request.nextUrl.pathname;
-    if (!user && isProtected(pathname)) {
+    if (!user && matches(pathname, PROTECTED_PREFIXES)) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = "/";
       redirectUrl.searchParams.set("login", "required");
@@ -66,6 +71,31 @@ export async function proxy(request: NextRequest) {
         });
       }
       return redirect;
+    }
+
+    // --- Rutas de administración: exigen sesión + rol `admin` ---
+    const adminHit = matches(pathname, ADMIN_PREFIXES);
+    if (adminHit) {
+      if (!user) {
+        const redirectUrl = request.nextUrl.clone();
+        redirectUrl.pathname = "/";
+        redirectUrl.searchParams.set("login", "required");
+        redirectUrl.searchParams.set("next", pathname);
+        return NextResponse.redirect(redirectUrl);
+      }
+
+      const { data: roleRow } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .single();
+
+      if (roleRow?.role !== ADMIN_ROLE) {
+        const redirectUrl = request.nextUrl.clone();
+        redirectUrl.pathname = "/";
+        redirectUrl.search = "";
+        return NextResponse.redirect(redirectUrl);
+      }
     }
   }
 

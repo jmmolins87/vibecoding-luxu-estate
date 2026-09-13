@@ -26,7 +26,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           src={property.images[0]}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
-        <SaveButton className="absolute top-3 right-3 rounded-full bg-white/90 p-2 text-nordic transition-colors hover:bg-mosque hover:text-white dark:bg-black/50 dark:text-white" />
+        <SaveButton propertyId={property.id} className="absolute top-3 right-3 rounded-full bg-white/90 p-2 text-nordic transition-colors hover:bg-mosque hover:text-white dark:bg-black/50 dark:text-white" />
         <div
           className={
             isRent
