@@ -173,6 +173,8 @@
     "password": "Mot de passe",
     "passwordPlaceholder": "••••••••",
     "passwordMin": "6 caractères minimum",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
     "signIn": "Se connecter",
     "signUp": "S'inscrire",
     "signingIn": "Connexion…",
@@ -192,7 +194,8 @@
       "weakPassword": "Le mot de passe doit comporter au moins 6 caractères.",
       "signupDisabled": "L'inscription est désactivée pour le moment.",
       "sessionMissing": "Votre session a expiré. Connectez-vous à nouveau.",
-      "samePassword": "Le nouveau mot de passe doit être différent."
+      "samePassword": "Le nouveau mot de passe doit être différent.",
+      "userBanned": "Votre compte est bloqué. Veuillez contacter l'administrateur."
     }
   },
   "saved": {
@@ -214,7 +217,6 @@
     "dashboard": "Tableau de bord",
     "properties": "Biens",
     "users": "Utilisateurs",
-    "inquiries": "Demandes",
     "notifications": "Notifications",
     "account": "Compte",
     "signingOut": "Déconnexion...",
@@ -264,6 +266,15 @@
     "confirmDeleteUser": "Supprimer définitivement cet utilisateur ? Sa session sera fermée et son accès révoqué.",
     "cannotDeleteSelf": "Vous ne pouvez pas supprimer votre propre compte.",
     "cannotChangeOwnRole": "Vous ne pouvez pas modifier votre propre rôle.",
+    "userCreated": "Utilisateur créé.",
+    "blocked": "Bloqué",
+    "blockUser": "Bloquer l'utilisateur",
+    "unblockUser": "Débloquer l'utilisateur",
+    "confirmBlockUser": "Bloquer cet utilisateur ? Il ne pourra plus accéder à l'application, mais ses données sont conservées.",
+    "cannotBlockSelf": "Vous ne pouvez pas bloquer votre propre compte.",
+    "blocking": "Blocage...",
+    "userBlocked": "Utilisateur bloqué.",
+    "userUnblocked": "Utilisateur débloqué.",
     "roleUpdatedTo": "Rôle mis à jour : {role}",
     "userSaved": "Utilisateur mis à jour",
     "userDeleted": "Utilisateur supprimé",

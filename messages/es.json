@@ -173,6 +173,8 @@
     "password": "Contraseña",
     "passwordPlaceholder": "••••••••",
     "passwordMin": "Mínimo 6 caracteres",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña",
     "signIn": "Iniciar sesión",
     "signUp": "Registrarse",
     "signingIn": "Iniciando sesión…",
@@ -192,7 +194,8 @@
       "weakPassword": "La contraseña debe tener al menos 6 caracteres.",
       "signupDisabled": "El registro está deshabilitado ahora mismo.",
       "sessionMissing": "Tu sesión ha caducado. Inicia sesión de nuevo.",
-      "samePassword": "La nueva contraseña debe ser diferente."
+      "samePassword": "La nueva contraseña debe ser diferente.",
+      "userBanned": "Tu cuenta está bloqueada. Contacta con el administrador."
     }
   },
   "saved": {
@@ -214,7 +217,6 @@
     "dashboard": "Panel",
     "properties": "Propiedades",
     "users": "Usuarios",
-    "inquiries": "Consultas",
     "notifications": "Notificaciones",
     "account": "Cuenta",
     "signingOut": "Cerrando sesión...",
@@ -264,6 +266,15 @@
     "confirmDeleteUser": "¿Eliminar este usuario definitivamente? Se cerrará su sesión y perderá el acceso.",
     "cannotDeleteSelf": "No puedes eliminar tu propio usuario.",
     "cannotChangeOwnRole": "No puedes cambiar tu propio rol.",
+    "userCreated": "Usuario creado.",
+    "blocked": "Bloqueado",
+    "blockUser": "Bloquear usuario",
+    "unblockUser": "Desbloquear usuario",
+    "confirmBlockUser": "¿Bloquear a este usuario? No podrá acceder a la app, pero sus datos se conservan.",
+    "cannotBlockSelf": "No puedes bloquear tu propio usuario.",
+    "blocking": "Bloqueando...",
+    "userBlocked": "Usuario bloqueado.",
+    "userUnblocked": "Usuario desbloqueado.",
     "roleUpdatedTo": "Rol actualizado a {role}",
     "userSaved": "Usuario actualizado",
     "userDeleted": "Usuario eliminado",

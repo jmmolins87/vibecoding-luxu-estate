@@ -4,11 +4,18 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import Icon from "@/components/ui/Icon";
 import { useToast } from "@/components/ui/Toast";
-import { deleteAdminUser, updateAdminUser } from "@/lib/actions/admin";
+import {
+  banAdminUser,
+  deleteAdminUser,
+  unbanAdminUser,
+  updateAdminUser,
+} from "@/lib/actions/admin";
 
 export interface UserActionsLabels {
   editUser: string;
   deleteUser: string;
+  blockUser: string;
+  unblockUser: string;
   fullName: string;
   email: string;
   newPassword: string;
@@ -17,9 +24,14 @@ export interface UserActionsLabels {
   saving: string;
   cancel: string;
   confirmDeleteUser: string;
+  confirmBlockUser: string;
   cannotDeleteSelf: string;
+  cannotBlockSelf: string;
+  blocking: string;
   userSaved: string;
   userDeleted: string;
+  userBlocked: string;
+  userUnblocked: string;
   errorDefault: string;
 }
 
@@ -35,28 +47,35 @@ export default function UserActions({
   email,
   displayName,
   isCurrent,
+  isBanned,
   labels,
 }: {
   userId: string;
   email: string;
   displayName: string | null;
   isCurrent: boolean;
+  /** Baneado en Auth: sin acceso a la app, pero sigue en BD. */
+  isBanned: boolean;
   labels: UserActionsLabels;
 }) {
   const router = useRouter();
   const { notify } = useToast();
   const [modalOpen, setModalOpen] = useState(false);
+  const [confirmBanOpen, setConfirmBanOpen] = useState(false);
   const [name, setName] = useState(displayName ?? "");
   const [mail, setMail] = useState(email);
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  // Cerrar con ESC + bloquear scroll mientras el modal está abierto.
+  // Cerrar con ESC + bloquear scroll mientras hay alguna modal abierta.
   useEffect(() => {
-    if (!modalOpen) return;
+    if (!modalOpen && !confirmBanOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !isPending) setModalOpen(false);
+      if (e.key === "Escape" && !isPending) {
+        setModalOpen(false);
+        setConfirmBanOpen(false);
+      }
     };
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
@@ -64,7 +83,7 @@ export default function UserActions({
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
-  }, [modalOpen, isPending]);
+  }, [modalOpen, confirmBanOpen, isPending]);
 
   function openModal() {
     setName(displayName ?? "");
@@ -85,6 +104,39 @@ export default function UserActions({
         });
         setModalOpen(false);
         notify(labels.userSaved);
+        router.refresh();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : labels.errorDefault);
+      }
+    });
+  }
+
+  function handleToggleBan() {
+    if (isCurrent) {
+      setError(labels.cannotBlockSelf);
+      return;
+    }
+    // Bloquear pide confirmación en modal; desbloquear es directo.
+    if (isBanned) {
+      confirmBanChange(false);
+      return;
+    }
+    setError(null);
+    setConfirmBanOpen(true);
+  }
+
+  function confirmBanChange(ban: boolean) {
+    setConfirmBanOpen(false);
+    setError(null);
+    startTransition(async () => {
+      try {
+        if (ban) {
+          await banAdminUser(userId);
+          notify(labels.userBlocked);
+        } else {
+          await unbanAdminUser(userId);
+          notify(labels.userUnblocked);
+        }
         router.refresh();
       } catch (e) {
         setError(e instanceof Error ? e.message : labels.errorDefault);
@@ -121,6 +173,29 @@ export default function UserActions({
           className="rounded-lg p-2 text-nordic/40 transition-all hover:bg-mosque/10 hover:text-mosque dark:text-gray-400 dark:hover:bg-mosque/20 dark:hover:text-hint"
         >
           <Icon name="edit" className="h-5 w-5" />
+        </button>
+        <button
+          type="button"
+          disabled={isPending || isCurrent}
+          onClick={handleToggleBan}
+          title={
+            isCurrent
+              ? labels.cannotBlockSelf
+              : `${isBanned ? labels.unblockUser : labels.blockUser}: ${email}`
+          }
+          aria-label={
+            isCurrent
+              ? labels.cannotBlockSelf
+              : `${isBanned ? labels.unblockUser : labels.blockUser}: ${email}`
+          }
+          aria-pressed={isBanned}
+          className={`rounded-lg p-2 transition-all disabled:opacity-40 ${
+            isBanned
+              ? "bg-mosque/10 text-mosque hover:bg-mosque/20 dark:bg-mosque/20 dark:text-hint"
+              : "text-amber-600 hover:bg-amber-500/10 hover:text-amber-700 dark:text-amber-400 dark:hover:bg-amber-500/20 dark:hover:text-amber-300"
+          }`}
+        >
+          <Icon name="block" className="h-5 w-5" />
         </button>
         <button
           type="button"
@@ -248,6 +323,76 @@ export default function UserActions({
                 className="rounded-lg bg-mosque px-5 py-2 text-sm font-medium text-white shadow-md shadow-mosque/20 transition-all hover:bg-mosque/90 disabled:opacity-60"
               >
                 {isPending ? labels.saving : labels.save}
+              </button>
+            </footer>
+          </div>
+        </div>
+      )}
+
+      {confirmBanOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          role="alertdialog"
+          aria-modal="true"
+          aria-label={labels.blockUser}
+          aria-describedby={`confirm-ban-desc-${userId}`}
+        >
+          <div
+            className="absolute inset-0 bg-nordic/40 backdrop-blur-sm"
+            onClick={() => !isPending && setConfirmBanOpen(false)}
+          />
+          <div className="relative w-full max-w-md overflow-hidden rounded-xl bg-white shadow-2xl dark:bg-[#0f231f]">
+            <header className="flex items-center justify-between border-b border-nordic/5 px-6 py-4 dark:border-white/10">
+              <h2 className="text-lg font-semibold text-nordic dark:text-white">
+                {labels.blockUser}
+              </h2>
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={() => setConfirmBanOpen(false)}
+                aria-label={labels.cancel}
+                className="rounded-full p-2 text-nordic/60 transition-colors hover:bg-nordic/5 disabled:opacity-50 dark:text-gray-400 dark:hover:bg-white/10"
+              >
+                <Icon name="close" className="h-5 w-5" />
+              </button>
+            </header>
+
+            <div className="flex items-start gap-4 p-6">
+              <span
+                aria-hidden="true"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400"
+              >
+                <Icon name="block" className="h-6 w-6" />
+              </span>
+              <div className="min-w-0">
+                <p
+                  id={`confirm-ban-desc-${userId}`}
+                  className="text-sm text-nordic/80 dark:text-gray-200"
+                >
+                  {labels.confirmBlockUser}
+                </p>
+                <p className="mt-1 truncate text-sm font-semibold text-nordic dark:text-white">
+                  {email}
+                </p>
+              </div>
+            </div>
+
+            <footer className="flex items-center justify-end gap-3 border-t border-nordic/5 px-6 py-4 dark:border-white/10">
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={() => setConfirmBanOpen(false)}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-nordic/70 transition-colors hover:bg-nordic/5 disabled:opacity-50 dark:text-gray-300 dark:hover:bg-white/10"
+              >
+                {labels.cancel}
+              </button>
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={() => confirmBanChange(true)}
+                className="inline-flex items-center justify-center rounded-lg border border-amber-600 bg-transparent px-4 py-2.5 text-sm font-medium whitespace-nowrap text-amber-600 transition-colors hover:bg-amber-500/10 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:outline-none disabled:opacity-60 dark:border-amber-400 dark:text-amber-400 dark:focus:ring-offset-[#0f231f]"
+              >
+                {isPending ? labels.blocking : labels.blockUser}
               </button>
             </footer>
           </div>

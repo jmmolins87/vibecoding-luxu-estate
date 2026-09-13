@@ -137,6 +137,7 @@ export default async function AdminPropertiesPage({
               del: t("admin.delete"),
               deleting: t("admin.deleting"),
               confirmDelete: t("admin.confirmDelete"),
+              cancel: t("admin.cancel"),
               propertyDeleted: t("admin.propertyDeleted"),
               errorDefault: t("admin.errorDefault"),
               sale: t("admin.form.sale"),

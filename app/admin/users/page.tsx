@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import UserCard from "@/components/admin/UserCard";
 import AdminSearch from "@/components/admin/AdminSearch";
 import Pagination from "@/components/admin/Pagination";
-import Icon from "@/components/ui/Icon";
+import UserCreateModal from "@/components/admin/UserCreateModal";
 import { getAdminUsers } from "@/lib/actions/admin";
 import { createAuthServerSupabaseClient } from "@/lib/supabase/server";
 import { withMinDuration } from "@/lib/delay";
@@ -79,13 +79,22 @@ export default async function AdminUsersPage({
               ariaLabel={t("admin.search")}
             />
           </Suspense>
-          <Link
-            href="#"
-            className="inline-flex items-center justify-center rounded-lg border border-mosque bg-transparent px-4 py-2.5 text-sm font-medium whitespace-nowrap text-mosque transition-colors hover:bg-mosque/5 focus:ring-2 focus:ring-mosque focus:ring-offset-2 focus:outline-none dark:focus:ring-offset-[#0f231f]"
-          >
-            <Icon name="plus" className="mr-2 h-5 w-5" />
-            {t("admin.addUser")}
-          </Link>
+          <UserCreateModal
+            labels={{
+              addUser: t("admin.addUser"),
+              fullName: t("admin.fullName"),
+              email: t("admin.email"),
+              password: t("auth.password"),
+              role: t("admin.role"),
+              adminRole: t("admin.adminRole"),
+              userRole: t("admin.userRole"),
+              save: t("admin.save"),
+              saving: t("admin.saving"),
+              cancel: t("admin.cancel"),
+              userCreated: t("admin.userCreated"),
+              errorDefault: t("admin.errorDefault"),
+            }}
+          />
         </div>
       </div>
 
@@ -125,6 +134,7 @@ export default async function AdminUsersPage({
             labels={{
               active: t("admin.active"),
               inactive: t("admin.inactive"),
+              blocked: t("admin.blocked"),
               adminRole: t("admin.adminRole"),
               userRole: t("admin.userRole"),
               changeRole: t("admin.changeRole"),
@@ -148,6 +158,13 @@ export default async function AdminUsersPage({
               cannotDeleteSelf: t("admin.cannotDeleteSelf"),
               userSaved: t("admin.userSaved"),
               userDeleted: t("admin.userDeleted"),
+              blockUser: t("admin.blockUser"),
+              unblockUser: t("admin.unblockUser"),
+              confirmBlockUser: t("admin.confirmBlockUser"),
+              cannotBlockSelf: t("admin.cannotBlockSelf"),
+              blocking: t("admin.blocking"),
+              userBlocked: t("admin.userBlocked"),
+              userUnblocked: t("admin.userUnblocked"),
             }}
           />
         ))}

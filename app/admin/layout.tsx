@@ -47,7 +47,6 @@ export default async function AdminLayout({
           { href: "/admin", label: t("admin.dashboard") },
           { href: "/admin/properties", label: t("admin.properties") },
           { href: "/admin/users", label: t("admin.users") },
-          { href: "#", label: t("admin.inquiries") },
         ]}
         user={{
           displayName,

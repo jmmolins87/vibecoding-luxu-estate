@@ -36,6 +36,7 @@ export default function LoginModal() {
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -45,6 +46,7 @@ export default function LoginModal() {
     setInfo(null);
     setBusy(false);
     setPassword("");
+    setShowPassword(false);
     closeLogin();
   }, [closeLogin]);
 
@@ -93,6 +95,7 @@ export default function LoginModal() {
     setMode(next);
     setError(null);
     setInfo(null);
+    setShowPassword(false);
   }
 
   function renderPanel(panelMode: Mode) {
@@ -144,17 +147,34 @@ export default function LoginModal() {
             <label htmlFor={`login-password-${panelMode}`} className="mb-1.5 block text-sm font-medium text-nordic dark:text-gray-200">
               {t("auth.password")}
             </label>
-            <input
-              id={`login-password-${panelMode}`}
-              type="password"
+            <div className="relative">
+              <input
+                id={`login-password-${panelMode}`}
+                type={showPassword ? "text" : "password"}
               required
               minLength={6}
               autoComplete={isSignup ? "new-password" : "current-password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={t("auth.passwordPlaceholder")}
-              className="w-full rounded-lg border border-nordic/10 bg-white px-4 py-3 text-sm text-nordic outline-none transition-all placeholder:text-nordic/30 focus:border-mosque focus:ring-2 focus:ring-mosque/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500"
+              className="w-full rounded-lg border border-nordic/10 bg-white py-3 pr-12 pl-4 text-sm text-nordic outline-none transition-all placeholder:text-nordic/30 focus:border-mosque focus:ring-2 focus:ring-mosque/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? t("auth.hidePassword") : t("auth.showPassword")}
+              aria-pressed={showPassword}
+              tabIndex={active ? undefined : -1}
+              className="absolute top-1/2 right-3 -translate-y-1/2 rounded-full p-1.5 text-nordic/40 transition-colors hover:bg-nordic/5 hover:text-nordic dark:text-gray-500 dark:hover:bg-white/10 dark:hover:text-white"
+            >
+              <span className="relative block h-5 w-5" aria-hidden="true">
+                <Icon name="eye" className="h-5 w-5" />
+                {!showPassword && (
+                  <span className="absolute top-1/2 left-1/2 h-[1.5px] w-6 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-full bg-current" />
+                )}
+                </span>
+              </button>
+            </div>
             {isSignup && (
               <p className="mt-1.5 text-xs text-nordic/50 dark:text-gray-500">{t("auth.passwordMin")}</p>
             )}

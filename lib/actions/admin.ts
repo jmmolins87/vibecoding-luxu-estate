@@ -335,6 +335,7 @@ export interface AdminUserRow {
   avatarUrl: string | null;
   createdAt: string;
   lastSignInAt: string | null;
+  bannedUntil: string | null;
   role: UserRole;
 }
 
@@ -404,6 +405,7 @@ export async function getAdminUsers(
         typeof avatar === "string" && avatar.length > 0 ? avatar : null,
       createdAt: metas[i]?.created_at ?? "",
       lastSignInAt: metas[i]?.last_sign_in_at ?? null,
+      bannedUntil: metas[i]?.banned_until ?? null,
       role: r.role ?? "user",
     };
   });
@@ -490,6 +492,87 @@ export async function deleteAdminUser(userId: string): Promise<{ ok: true }> {
   }
   const service = requireService();
   const { error } = await service.auth.admin.deleteUser(userId);
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin/users");
+  return { ok: true };
+}
+
+/**
+ * Crea un usuario de Auth con email ya confirmado y su fila de rol.
+ * El trigger `handle_new_user` crea la fila en `user_roles`, pero se hace
+ * upsert explícito para fijar el rol pedido y no depender del trigger.
+ * Exige sesión admin.
+ */
+export async function createAdminUser(
+  input: { fullName?: string; email: string; password: string; role?: UserRole },
+): Promise<{ ok: true }> {
+  await requireAdminUserId();
+  const service = requireService();
+
+  const email = input.email.trim();
+  const password = input.password;
+  const fullName = input.fullName?.trim() ?? "";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new Error("Correo no válido.");
+  }
+  if (password.length < 6) {
+    throw new Error("La contraseña debe tener al menos 6 caracteres.");
+  }
+  const role: UserRole = input.role === "admin" ? "admin" : "user";
+
+  const { data, error } = await service.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: fullName === "" ? {} : { full_name: fullName },
+  });
+  if (error || !data.user) {
+    throw new Error(error?.message ?? "No se pudo crear el usuario.");
+  }
+
+  const { error: roleError } = await service
+    .from("user_roles")
+    .upsert(
+      { user_id: data.user.id, role, email },
+      { onConflict: "user_id" },
+    );
+  if (roleError) throw new Error(roleError.message);
+
+  revalidatePath("/admin/users");
+  return { ok: true };
+}
+
+/**
+ * Bloquea a un usuario (`ban_duration` de ~10 años): no podrá iniciar
+ * sesión, pero conserva sus datos y su fila de rol. No permite
+ * autobloqueo. Exige sesión admin.
+ */
+export async function banAdminUser(userId: string): Promise<{ ok: true }> {
+  const adminId = await requireAdminUserId();
+  if (userId === adminId) {
+    throw new Error("No puedes bloquear tu propio usuario.");
+  }
+  const service = requireService();
+  const { error } = await service.auth.admin.updateUserById(userId, {
+    ban_duration: "87600h",
+  });
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin/users");
+  return { ok: true };
+}
+
+/**
+ * Desbloquea a un usuario baneado (`ban_duration: "none"`).
+ * Exige sesión admin.
+ */
+export async function unbanAdminUser(userId: string): Promise<{ ok: true }> {
+  await requireAdminUserId();
+  const service = requireService();
+  const { error } = await service.auth.admin.updateUserById(userId, {
+    ban_duration: "none",
+  });
   if (error) throw new Error(error.message);
 
   revalidatePath("/admin/users");

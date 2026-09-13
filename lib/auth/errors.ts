@@ -6,6 +6,7 @@
  * Todo lo no reconocido cae en `auth.errorDefault`.
  */
 const patterns: Array<[RegExp, string]> = [
+  [/banned|user_banned/i, "auth.errors.userBanned"],
   [/rate limit/i, "auth.errors.rateLimited"],
   [/already (been )?registered|already exists|duplicate/i, "auth.errors.userExists"],
   [/invalid login credentials/i, "auth.errors.invalidCredentials"],

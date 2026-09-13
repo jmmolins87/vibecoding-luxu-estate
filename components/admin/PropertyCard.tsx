@@ -8,6 +8,7 @@ export interface PropertyCardLabels {
   del: string;
   deleting: string;
   confirmDelete: string;
+  cancel: string;
   propertyDeleted: string;
   errorDefault: string;
   sale: string;
@@ -134,6 +135,7 @@ export default function PropertyCard({
             del: labels.del,
             deleting: labels.deleting,
             confirm: labels.confirmDelete,
+            cancel: labels.cancel,
             propertyDeleted: labels.propertyDeleted,
             errorDefault: labels.errorDefault,
           }}

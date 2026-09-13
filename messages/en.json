@@ -173,6 +173,8 @@
     "password": "Password",
     "passwordPlaceholder": "••••••••",
     "passwordMin": "Minimum 6 characters",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "signIn": "Sign in",
     "signUp": "Sign up",
     "signingIn": "Signing in…",
@@ -192,7 +194,8 @@
       "weakPassword": "Password must be at least 6 characters.",
       "signupDisabled": "Registration is currently disabled.",
       "sessionMissing": "Your session expired. Please sign in again.",
-      "samePassword": "The new password must be different."
+      "samePassword": "The new password must be different.",
+      "userBanned": "Your account is blocked. Please contact the administrator."
     }
   },
   "saved": {
@@ -214,7 +217,6 @@
     "dashboard": "Dashboard",
     "properties": "Properties",
     "users": "Users",
-    "inquiries": "Inquiries",
     "notifications": "Notifications",
     "account": "Account",
     "signingOut": "Signing out...",
@@ -264,6 +266,15 @@
     "confirmDeleteUser": "Delete this user permanently? Their session will end and access will be lost.",
     "cannotDeleteSelf": "You cannot delete your own account.",
     "cannotChangeOwnRole": "You cannot change your own role.",
+    "userCreated": "User created.",
+    "blocked": "Blocked",
+    "blockUser": "Block user",
+    "unblockUser": "Unblock user",
+    "confirmBlockUser": "Block this user? They won't be able to access the app, but their data is kept.",
+    "cannotBlockSelf": "You cannot block your own account.",
+    "blocking": "Blocking...",
+    "userBlocked": "User blocked.",
+    "userUnblocked": "User unblocked.",
     "roleUpdatedTo": "Role updated to {role}",
     "userSaved": "User updated",
     "userDeleted": "User deleted",
