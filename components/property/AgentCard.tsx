@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Icon from "@/components/ui/Icon";
+import SaveButton from "@/components/home/SaveButton";
 import { formatPrice, type Property } from "@/types/property";
 import { useTranslations, useLocale } from "@/lib/i18n/client";
 
@@ -27,18 +28,26 @@ export default function AgentCard({ property }: AgentCardProps) {
   return (
     <div className="rounded-xl border border-mosque/5 bg-white p-6 shadow-sm dark:bg-white/5">
       <div className="mb-4">
-        <h1 className="mb-2 text-4xl font-light text-nordic dark:text-white">
-          {formatPrice(property, locale)}
-          {property.priceSuffix && (
-            <span className="text-lg font-normal text-nordic-muted">
-              {property.priceSuffix}
-            </span>
-          )}
-        </h1>
-        <p className="flex items-center gap-1 font-medium text-nordic/60 dark:text-gray-300">
-          <Icon name="place" className="h-4 w-4 text-mosque" />
-          {property.address}
-        </p>
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <h1 className="mb-2 text-4xl font-light text-nordic dark:text-white">
+              {formatPrice(property, locale)}
+              {property.priceSuffix && (
+                <span className="text-lg font-normal text-nordic-muted">
+                  {property.priceSuffix}
+                </span>
+              )}
+            </h1>
+            <p className="flex items-center gap-1 font-medium text-nordic/60 dark:text-gray-300">
+              <Icon name="place" className="h-4 w-4 text-mosque" />
+              {property.address}
+            </p>
+          </div>
+          <SaveButton
+            propertyId={property.id}
+            className="mt-1 flex-shrink-0 rounded-full bg-mosque/10 p-2.5 text-nordic transition-colors hover:bg-red-50 hover:text-red-500 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+          />
+        </div>
       </div>
 
       <div className="my-6 h-px bg-slate-100 dark:bg-white/10" />
