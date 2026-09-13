@@ -289,6 +289,14 @@
     "propertyUpdated": "Bien mis à jour",
     "propertyDeleted": "Bien supprimé",
     "deleting": "Suppression...",
+    "deactivate": "Désactiver",
+    "activate": "Activer",
+    "deactivating": "Désactivation...",
+    "activating": "Activation...",
+    "confirmDeactivate": "Désactiver ce bien ? Il ne sera plus visible sur le site, mais sera conservé pour de futures mises à jour.",
+    "confirmActivate": "Activer ce bien ? Il sera de nouveau visible sur le site.",
+    "propertyDeactivated": "Bien désactivé",
+    "propertyActivated": "Bien activé",
     "saving": "Enregistrement...",
     "createProperty": "Créer un bien",
     "editProperty": "Modifier le bien",
@@ -309,6 +317,7 @@
       "location": "Emplacement",
       "price": "Prix",
       "status": "Statut",
+      "listing": "Annonce",
       "featured": "En vedette",
       "actions": "Actions"
     },
@@ -380,7 +389,8 @@
       "addMore": "Ajouter",
       "invalidType": "Format invalide. Utilisez JPG, PNG ou WEBP.",
       "tooLarge": "Chaque image doit peser 25 Mo maximum.",
-      "imageRequired": "Au moins une image est requise."
+      "imageRequired": "Au moins une image est requise.",
+      "inactiveNotice": "Ce bien est désactivé et n'est pas visible sur le site."
     }
   }
 }

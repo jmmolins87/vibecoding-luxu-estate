@@ -289,6 +289,14 @@
     "propertyUpdated": "Propiedad actualizada",
     "propertyDeleted": "Propiedad eliminada",
     "deleting": "Eliminando...",
+    "deactivate": "Desactivar",
+    "activate": "Activar",
+    "deactivating": "Desactivando...",
+    "activating": "Activando...",
+    "confirmDeactivate": "¿Desactivar esta propiedad? Dejará de verse en la web, pero se conservará para futuras actualizaciones.",
+    "confirmActivate": "¿Activar esta propiedad? Volverá a verse en la web.",
+    "propertyDeactivated": "Propiedad desactivada",
+    "propertyActivated": "Propiedad activada",
     "saving": "Guardando...",
     "createProperty": "Crear propiedad",
     "editProperty": "Editar propiedad",
@@ -309,6 +317,7 @@
       "location": "Ubicación",
       "price": "Precio",
       "status": "Estado",
+      "listing": "Anuncio",
       "featured": "Destacada",
       "actions": "Acciones"
     },
@@ -380,7 +389,8 @@
       "addMore": "Añadir más",
       "invalidType": "Formato no válido. Usa JPG, PNG o WEBP.",
       "tooLarge": "Cada imagen debe pesar 25 MB como máximo.",
-      "imageRequired": "Se requiere al menos una imagen."
+      "imageRequired": "Se requiere al menos una imagen.",
+      "inactiveNotice": "Esta propiedad está desactivada y no es visible en la web."
     }
   }
 }

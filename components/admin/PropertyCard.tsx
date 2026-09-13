@@ -1,15 +1,21 @@
 import Link from "next/link";
-import DeletePropertyButton from "@/components/admin/DeletePropertyButton";
+import TogglePropertyActiveButton from "@/components/admin/TogglePropertyActiveButton";
 import Icon from "@/components/ui/Icon";
 import type { AdminPropertyRow } from "@/lib/actions/admin";
 
 export interface PropertyCardLabels {
   edit: string;
-  del: string;
-  deleting: string;
-  confirmDelete: string;
+  activate: string;
+  deactivate: string;
+  activating: string;
+  deactivating: string;
+  confirmActivate: string;
+  confirmDeactivate: string;
   cancel: string;
-  propertyDeleted: string;
+  propertyActivated: string;
+  propertyDeactivated: string;
+  active: string;
+  inactive: string;
   errorDefault: string;
   sale: string;
   rent: string;
@@ -39,14 +45,15 @@ export default function PropertyCard({
 }) {
   const isSale = p.status === "sale";
   const isSold = p.status === "sold";
+  const isActive = p.is_active ?? true;
   const addressLine = [p.address, p.location].filter(Boolean).join(", ");
 
   return (
     <div
-      className={`group grid grid-cols-1 items-center gap-4 px-6 py-5 transition-colors hover:bg-clearday md:grid-cols-12 dark:hover:bg-mosque/5 ${isLast ? "" : "border-b border-nordic/5 dark:border-white/5"}`}
+      className={`group grid grid-cols-2 items-center gap-3 px-6 py-5 transition-colors hover:bg-clearday md:grid-cols-[minmax(0,1fr)_150px_120px_120px_76px] dark:hover:bg-mosque/5 ${isLast ? "" : "border-b border-nordic/5 dark:border-white/5"} ${isActive ? "" : "opacity-70"}`}
     >
       {/* Detalles */}
-      <div className="col-span-12 flex items-center gap-4 md:col-span-6">
+      <div className="col-span-2 flex items-center gap-4 md:col-span-1">
         <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-lg bg-nordic/5 dark:bg-white/10">
           {p.image ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -64,12 +71,12 @@ export default function PropertyCard({
         <div className="min-w-0">
           <Link
             href={`/admin/properties/${p.id}`}
-            className="block truncate text-lg font-bold text-nordic transition-colors group-hover:text-mosque dark:text-white dark:group-hover:text-hint"
+            className="block text-lg font-bold text-nordic transition-colors group-hover:text-mosque dark:text-white dark:group-hover:text-hint"
           >
             {p.title}
           </Link>
           {addressLine !== "" && (
-            <p className="truncate text-sm text-nordic/50 dark:text-gray-400">
+            <p className="text-sm text-nordic/50 dark:text-gray-400">
               {addressLine}
             </p>
           )}
@@ -92,7 +99,7 @@ export default function PropertyCard({
       </div>
 
       {/* Precio */}
-      <div className="col-span-6 md:col-span-2">
+      <div className="col-span-1">
         <p className="text-base font-semibold text-nordic dark:text-gray-200">
           {formatPrice(p.price)}
           {p.price_suffix ?? ""}
@@ -104,10 +111,26 @@ export default function PropertyCard({
         ) : null}
       </div>
 
-      {/* Estado */}
-      <div className="col-span-6 md:col-span-2">
+      {/* Estado: activa / inactiva */}
+      <div className="col-span-1">
         <span
-          className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium ${
+          className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium whitespace-nowrap ${
+            isActive
+              ? "border-mosque/10 bg-hint text-mosque"
+              : "border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-400"
+          }`}
+        >
+          <span
+            className={`mr-1.5 h-1.5 w-1.5 rounded-full ${isActive ? "bg-mosque" : "bg-red-500"}`}
+          />
+          {isActive ? labels.active : labels.inactive}
+        </span>
+      </div>
+
+      {/* Anuncio: venta / alquiler / vendida */}
+      <div className="col-span-1">
+        <span
+          className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium whitespace-nowrap ${
             isSale
               ? "border-mosque/10 bg-hint text-mosque"
               : isSold
@@ -123,24 +146,29 @@ export default function PropertyCard({
       </div>
 
       {/* Acciones */}
-      <div className="col-span-12 flex items-center justify-end gap-2 md:col-span-2">
+      <div className="col-span-1 flex items-center justify-end gap-1">
         <Link
           href={`/admin/properties/${p.id}`}
           title={`${labels.edit}: ${p.title}`}
           aria-label={`${labels.edit}: ${p.title}`}
-          className="rounded-lg p-2 text-nordic/40 transition-all hover:bg-hint/40 hover:text-mosque dark:text-gray-400 dark:hover:bg-mosque/20 dark:hover:text-hint"
+          className="shrink-0 rounded-lg p-1.5 text-nordic/40 transition-all hover:bg-hint/40 hover:text-mosque dark:text-gray-400 dark:hover:bg-mosque/20 dark:hover:text-hint"
         >
           <Icon name="edit" className="h-5 w-5" />
         </Link>
-        <DeletePropertyButton
+        <TogglePropertyActiveButton
           id={p.id}
           title={p.title}
+          isActive={isActive}
           labels={{
-            del: labels.del,
-            deleting: labels.deleting,
-            confirm: labels.confirmDelete,
+            activate: labels.activate,
+            deactivate: labels.deactivate,
+            activating: labels.activating,
+            deactivating: labels.deactivating,
+            confirmActivate: labels.confirmActivate,
+            confirmDeactivate: labels.confirmDeactivate,
             cancel: labels.cancel,
-            propertyDeleted: labels.propertyDeleted,
+            propertyActivated: labels.propertyActivated,
+            propertyDeactivated: labels.propertyDeactivated,
             errorDefault: labels.errorDefault,
           }}
         />

@@ -289,6 +289,14 @@
     "propertyUpdated": "Property updated",
     "propertyDeleted": "Property deleted",
     "deleting": "Deleting...",
+    "deactivate": "Deactivate",
+    "activate": "Activate",
+    "deactivating": "Deactivating...",
+    "activating": "Activating...",
+    "confirmDeactivate": "Deactivate this property? It will stop being visible on the site, but will be kept for future updates.",
+    "confirmActivate": "Activate this property? It will become visible on the site again.",
+    "propertyDeactivated": "Property deactivated",
+    "propertyActivated": "Property activated",
     "saving": "Saving...",
     "createProperty": "Create property",
     "editProperty": "Edit property",
@@ -309,6 +317,7 @@
       "location": "Location",
       "price": "Price",
       "status": "Status",
+      "listing": "Listing",
       "featured": "Featured",
       "actions": "Actions"
     },
@@ -380,7 +389,8 @@
       "addMore": "Add More",
       "invalidType": "Invalid format. Use JPG, PNG or WEBP.",
       "tooLarge": "Each image must be 25 MB or less.",
-      "imageRequired": "At least one image is required."
+      "imageRequired": "At least one image is required.",
+      "inactiveNotice": "This property is deactivated and is not visible on the site."
     }
   }
 }

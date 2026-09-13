@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Icon from "@/components/ui/Icon";
 import { categoryFilters } from "@/data/properties";
@@ -27,6 +27,13 @@ export default function HeroSearch({ filters, total }: HeroSearchProps) {
   const [query, setQuery] = useState(filters.city ?? "");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const activeCount = countActiveFilters(filters);
+
+  // Re-sincroniza el campo con la URL si la ciudad cambia desde
+  // fuera (ej. quitar el chip ✕): el input es controlado y el
+  // estado no se resetea solo. Al escribir no se dispara.
+  useEffect(() => {
+    setQuery(filters.city ?? "");
+  }, [filters.city]);
   const activeCategory = filters.type ?? "All";
 
   const pushFilters = (patch: Partial<PropertyFilters>) => {
@@ -67,9 +74,6 @@ export default function HeroSearch({ filters, total }: HeroSearchProps) {
           </div>
           <input
             type="text"
-            // key: re-sincroniza con la URL si la ciudad cambia desde
-            // fuera (ej. quitar el chip ✕); al escribir no remonta.
-            key={`hero-search-${filters.city ?? "all"}`}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && submitSearch()}

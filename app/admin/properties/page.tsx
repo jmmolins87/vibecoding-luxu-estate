@@ -120,11 +120,12 @@ export default async function AdminPropertiesPage({
       </div>
 
       <div className="overflow-hidden rounded-xl border border-nordic/10 bg-white shadow-sm dark:border-white/10 dark:bg-white/5">
-        <div className="hidden grid-cols-12 gap-4 border-b border-nordic/5 bg-nordic/[0.03] px-6 py-4 text-xs font-semibold tracking-wider text-nordic/50 uppercase md:grid dark:border-white/5 dark:bg-white/5 dark:text-gray-400">
-          <div className="col-span-6">{t("admin.colPropertyDetails")}</div>
-          <div className="col-span-2">{t("admin.cols.price")}</div>
-          <div className="col-span-2">{t("admin.cols.status")}</div>
-          <div className="col-span-2 text-right">{t("admin.cols.actions")}</div>
+        <div className="hidden gap-3 border-b border-nordic/5 bg-nordic/[0.03] px-6 py-4 text-xs font-semibold tracking-wider text-nordic/50 uppercase md:grid md:grid-cols-[minmax(0,1fr)_150px_120px_120px_76px] dark:border-white/5 dark:bg-white/5 dark:text-gray-400">
+          <div>{t("admin.colPropertyDetails")}</div>
+          <div>{t("admin.cols.price")}</div>
+          <div>{t("admin.cols.status")}</div>
+          <div>{t("admin.cols.listing")}</div>
+          <div className="text-right">{t("admin.cols.actions")}</div>
         </div>
 
         {rows.map((p, i) => (
@@ -134,11 +135,17 @@ export default async function AdminPropertiesPage({
             isLast={i === rows.length - 1}
             labels={{
               edit: t("admin.edit"),
-              del: t("admin.delete"),
-              deleting: t("admin.deleting"),
-              confirmDelete: t("admin.confirmDelete"),
+              activate: t("admin.activate"),
+              deactivate: t("admin.deactivate"),
+              activating: t("admin.activating"),
+              deactivating: t("admin.deactivating"),
+              confirmActivate: t("admin.confirmActivate"),
+              confirmDeactivate: t("admin.confirmDeactivate"),
               cancel: t("admin.cancel"),
-              propertyDeleted: t("admin.propertyDeleted"),
+              propertyActivated: t("admin.propertyActivated"),
+              propertyDeactivated: t("admin.propertyDeactivated"),
+              active: t("admin.active"),
+              inactive: t("admin.inactive"),
               errorDefault: t("admin.errorDefault"),
               sale: t("admin.form.sale"),
               rent: t("admin.form.rent"),

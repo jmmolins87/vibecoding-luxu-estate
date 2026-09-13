@@ -34,6 +34,8 @@ export interface PropertyRow {
   lng?: number | string | null;
   tag: Property["tag"] | null;
   featured: boolean;
+  /** Desactivación lógica: solo `true` es visible en la web pública. */
+  is_active?: boolean | null;
 }
 
 export function mapRowToProperty(row: PropertyRow): Property {
@@ -87,6 +89,20 @@ export interface PaginatedProperties {
   status: PropertyStatusFilter;
   filters: PropertyFilters;
   fromSupabase: boolean;
+}
+
+/** Escapa `%`, `_` y `\` para búsquedas `ilike` literales. */
+function escapeLike(value: string): string {
+  return value.replace(/[\\%_]/g, (m) => `\\${m}`);
+}
+
+/**
+ * Condición `ilike` para un `or()` de PostgREST. Si el patrón trae
+ * `,`, `(` o `)` se envuelve en comillas (si no, rompería el `or`).
+ */
+function orLike(column: string, like: string): string {
+  const value = /[,()]/.test(like) ? `"${like.replace(/"/g, '""')}"` : like;
+  return `${column}.ilike.${value}`;
 }
 
 /**
@@ -213,6 +229,7 @@ export const getFeaturedProperties = cache(
       .from("properties")
       .select("*")
       .eq("featured", true)
+      .eq("is_active", true)
       .neq("status", "sold")
       .order("created_at", { ascending: false })
       .limit(2);
@@ -275,9 +292,16 @@ export const getPaginatedProperties = cache(
             else q = q.neq("status", "sold");
             break;
           case "city":
+            // El buscador de la home cubre título + ubicación + dirección.
             if (typeof value === "string" && value.trim() !== "") {
-              const like = `%${value.trim()}%`;
-              q = q.or(`location.ilike.${like},address.ilike.${like}`);
+              const like = `%${escapeLike(value.trim())}%`;
+              q = q.or(
+                [
+                  orLike("title", like),
+                  orLike("location", like),
+                  orLike("address", like),
+                ].join(","),
+              );
             }
             break;
           case "minPrice":
@@ -306,10 +330,12 @@ export const getPaginatedProperties = cache(
     };
 
     // Primero el total para calcular totalPages (count exacto, sin traer filas)
+    // Solo propiedades activas: las desactivadas no aparecen en la web.
     const countBase = supabase
       .from("properties")
       .select("*", { count: "exact", head: true })
-      .eq("featured", false);
+      .eq("featured", false)
+      .eq("is_active", true);
     const { count, error: countError } = await buildFiltered(countBase);
     if (countError || count === null)
       return paginateLocal(requestedPage, pageSize, filters);
@@ -324,6 +350,7 @@ export const getPaginatedProperties = cache(
       .from("properties")
       .select("*")
       .eq("featured", false)
+      .eq("is_active", true)
       .order("created_at", { ascending: false })
       .range(from, to);
     const { data, error } = await buildFiltered(dataBase);
@@ -408,6 +435,8 @@ export const getPropertyBySlug = cache(
 
     if (!error && data) {
       const row = data as PropertyRow;
+      // Las desactivadas no existen para la web pública (404).
+      if (row.is_active === false) return null;
       const property = completeWithLocal(row, mapRowToProperty(row));
       const usage = await getStoredImageUsage();
       dedupeImages([property], usage);
@@ -422,6 +451,7 @@ export const getPropertyBySlug = cache(
       .maybeSingle();
     if (!byId.error && byId.data) {
       const row = byId.data as PropertyRow;
+      if (row.is_active === false) return null;
       const property = completeWithLocal(row, mapRowToProperty(row));
       const usage = await getStoredImageUsage();
       dedupeImages([property], usage);
@@ -442,7 +472,10 @@ export const getAllPropertySlugs = cache(async (): Promise<string[]> => {
     return [...featuredProperties, ...newInMarketProperties].map((p) => p.slug);
   }
 
-  const { data, error } = await supabase.from("properties").select("slug, id");
+  const { data, error } = await supabase
+    .from("properties")
+    .select("slug, id")
+    .eq("is_active", true);
   if (error || !data) {
     return [...featuredProperties, ...newInMarketProperties].map((p) => p.slug);
   }

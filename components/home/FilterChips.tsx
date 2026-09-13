@@ -105,7 +105,12 @@ export default function FilterChips({ filters }: { filters: PropertyFilters }) {
       ...remove,
       status: status as "sale" | "rent" | undefined,
     });
-    startTransition(() => router.push(qs ? `/?${qs}#market` : "/#market"));
+    // Al quitar un filtro se vuelve arriba (zona de búsqueda),
+    // sin el ancla #market que apunta a los resultados.
+    startTransition(() => {
+      router.push(qs ? `/?${qs}` : "/", { scroll: false });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
   };
 
   return (

@@ -71,6 +71,8 @@ export interface AdminPropertyRow {
   image: string;
   tag: string | null;
   featured: boolean;
+  /** Desactivación lógica: el admin ve todas, la web solo las activas. */
+  is_active: boolean;
   created_at: string;
 }
 
@@ -93,7 +95,7 @@ export async function getAdminProperties(
     let base = service
       .from("properties")
       .select(
-        "id, slug, title, location, address, price, price_suffix, type, status, beds, baths, area, garage, image, tag, featured, created_at",
+        "id, slug, title, location, address, price, price_suffix, type, status, beds, baths, area, garage, image, tag, featured, is_active, created_at",
         { count: "exact" },
       );
     if (query !== "") {
@@ -137,7 +139,12 @@ export async function getAdminProperties(
     .range(from, from + pageSize - 1);
   if (error) throw new Error(error.message);
 
-  return { rows: (data ?? []) as AdminPropertyRow[], total, totalPages, page, pageSize };
+  // El admin ve activas e inactivas; `?? true` por compatibilidad con BD sin migrar.
+  const rows = ((data ?? []) as AdminPropertyRow[]).map((r) => ({
+    ...r,
+    is_active: r.is_active ?? true,
+  }));
+  return { rows, total, totalPages, page, pageSize };
 }
 
 export interface AdminPropertyDetail extends AdminPropertyRow {
@@ -323,16 +330,29 @@ export async function updateProperty(
   return { ok: true };
 }
 
-export async function deleteProperty(id: string): Promise<{ ok: true }> {
+/**
+ * Activa o desactiva una propiedad (desactivación lógica en vez de
+ * borrado físico). Las desactivadas desaparecen de la web pública
+ * pero siguen visibles en el panel admin para futuras actualizaciones.
+ */
+export async function setPropertyActive(
+  id: string,
+  active: boolean,
+): Promise<{ ok: true }> {
   await requireAdminUserId();
   const service = requireService();
 
-  const { error } = await service.from("properties").delete().eq("id", id);
+  const { error } = await service
+    .from("properties")
+    .update({ is_active: active })
+    .eq("id", id);
   if (error) throw new Error(error.message);
 
   revalidatePath("/admin");
   revalidatePath("/admin/properties");
   revalidatePath("/");
+  revalidatePath("/saved");
+  revalidatePath("/property/[slug]", "page");
   return { ok: true };
 }
 

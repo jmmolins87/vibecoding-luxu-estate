@@ -84,7 +84,8 @@ export async function getSavedProperties(): Promise<Property[]> {
   const { data: rows, error: propsError } = await supabase
     .from("properties")
     .select("*")
-    .in("id", ids);
+    .in("id", ids)
+    .eq("is_active", true);
 
   if (propsError || !rows) return [];
 

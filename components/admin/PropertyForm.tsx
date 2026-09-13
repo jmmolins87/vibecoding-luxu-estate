@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, useTransition, type FormEvent, type ReactN
 import { useRouter } from "next/navigation";
 import {
   createProperty,
-  deleteProperty,
+  setPropertyActive,
   updateProperty,
   type AdminPropertyDetail,
   type PropertyFormInput,
@@ -77,10 +77,15 @@ export interface PropertyFormLabels extends GalleryUploaderLabels {
   lng: string;
   cancel: string;
   saving: string;
-  deleteLabel: string;
-  deleting: string;
-  confirmDelete: string;
-  propertyDeleted: string;
+  activate: string;
+  deactivate: string;
+  activating: string;
+  deactivating: string;
+  confirmActivate: string;
+  confirmDeactivate: string;
+  propertyActivated: string;
+  propertyDeactivated: string;
+  inactiveNotice: string;
   imageRequired: string;
   propertyCreated: string;
   propertyUpdated: string;
@@ -242,9 +247,11 @@ export default function PropertyForm({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [locating, setLocating] = useState(false);
-  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
-  const [isDeleting, startDeleting] = useTransition();
+  const [confirmToggleOpen, setConfirmToggleOpen] = useState(false);
+  const [isToggling, startToggling] = useTransition();
   const isEdit = Boolean(propertyId);
+  // Las nuevas siempre nacen activas; al editar se respeta el estado guardado.
+  const isActive = initial?.is_active ?? true;
   // Dirección/ciudad iniciales: solo se geocodifica cuando el usuario las cambia.
   const initialGeoRef = useRef({
     address: (initial?.address ?? "").trim(),
@@ -279,24 +286,24 @@ export default function PropertyForm({
     return () => clearTimeout(timer);
   }, [form.address, form.location]);
 
-  // Cerrar el modal de borrado con ESC.
+  // Cerrar el modal de activar/desactivar con ESC.
   useEffect(() => {
-    if (!confirmDeleteOpen) return;
+    if (!confirmToggleOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !isDeleting) setConfirmDeleteOpen(false);
+      if (e.key === "Escape" && !isToggling) setConfirmToggleOpen(false);
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [confirmDeleteOpen, isDeleting]);
+  }, [confirmToggleOpen, isToggling]);
 
-  function handleDelete() {
+  function handleToggleActive() {
     if (!propertyId) return;
-    setConfirmDeleteOpen(false);
+    setConfirmToggleOpen(false);
     setError(null);
-    startDeleting(async () => {
+    startToggling(async () => {
       try {
-        await deleteProperty(propertyId);
-        notify(labels.propertyDeleted);
+        await setPropertyActive(propertyId, !isActive);
+        notify(isActive ? labels.propertyDeactivated : labels.propertyActivated);
         router.push("/admin/properties");
         router.refresh();
       } catch (err) {
@@ -399,6 +406,13 @@ export default function PropertyForm({
           </div>
         </div>
       </header>
+
+      {isEdit && !isActive && (
+        <p role="status" className="mb-6 flex items-center gap-2 rounded-lg bg-red-500/10 px-4 py-3 text-sm text-red-700 dark:text-red-400">
+          <Icon name="inactive" className="h-4 w-4 shrink-0" />
+          {labels.inactiveNotice}
+        </p>
+      )}
 
       {error && (
         <p role="alert" className="mb-6 rounded-lg bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-400">
@@ -690,13 +704,6 @@ export default function PropertyForm({
                 {customAmenities.length > 0 && (
                   <p className={helpCls}>{labels.amenities}: {customAmenities.join(", ")}</p>
                 )}
-                <input
-                  id="pf-amenities" value={form.amenities}
-                  onChange={(e) => set("amenities", e.target.value)}
-                  className={`${inputCls} mt-3`}
-                  aria-label={labels.amenities}
-                />
-                <p className={helpCls}>{labels.amenitiesHelp}</p>
               </div>
             </div>
           </div>
@@ -709,18 +716,28 @@ export default function PropertyForm({
             {isEdit && (
               <button
                 type="button"
-                onClick={() => setConfirmDeleteOpen(true)}
-                disabled={isPending || isDeleting}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-transparent px-4 py-2.5 text-sm font-medium whitespace-nowrap text-red-600 transition-colors hover:bg-red-500/10 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-red-400 dark:text-red-400 dark:focus:ring-offset-[#0f231f]"
+                onClick={() => setConfirmToggleOpen(true)}
+                disabled={isPending || isToggling}
+                className={
+                  isActive
+                    ? "inline-flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-transparent px-4 py-2.5 text-sm font-medium whitespace-nowrap text-red-600 transition-colors hover:bg-red-500/10 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-red-400 dark:text-red-400 dark:focus:ring-offset-[#0f231f]"
+                    : "inline-flex items-center justify-center gap-2 rounded-lg border border-mosque bg-transparent px-4 py-2.5 text-sm font-medium whitespace-nowrap text-mosque transition-colors hover:bg-mosque/5 focus:ring-2 focus:ring-mosque focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-[#0f231f]"
+                }
               >
-                <Icon name="delete" className="h-4 w-4" />
-                {isDeleting ? labels.deleting : labels.deleteLabel}
+                <Icon name={isActive ? "block" : "eye"} className="h-4 w-4" />
+                {isToggling
+                  ? isActive
+                    ? labels.deactivating
+                    : labels.activating
+                  : isActive
+                    ? labels.deactivate
+                    : labels.activate}
               </button>
             )}
             <button
               type="submit"
               form="pf-form"
-              disabled={isPending || isDeleting || !isDirty}
+              disabled={isPending || isToggling || !isDirty}
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-mosque px-6 py-2.5 text-sm font-medium whitespace-nowrap text-white transition-colors hover:bg-mosque/90 focus:ring-2 focus:ring-mosque focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-[#0f231f]"
             >
               <Icon name="check" className="h-4 w-4" />
@@ -730,26 +747,26 @@ export default function PropertyForm({
         </div>
       </form>
 
-      {confirmDeleteOpen && (
+      {confirmToggleOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           role="alertdialog"
           aria-modal="true"
-          aria-label={labels.deleteLabel}
+          aria-label={isActive ? labels.deactivate : labels.activate}
         >
           <div
             className="absolute inset-0 bg-nordic/40 backdrop-blur-sm"
-            onClick={() => !isDeleting && setConfirmDeleteOpen(false)}
+            onClick={() => !isToggling && setConfirmToggleOpen(false)}
           />
           <div className="relative w-full max-w-md overflow-hidden rounded-xl bg-white shadow-2xl dark:bg-[#0f231f]">
             <header className="flex items-center justify-between border-b border-nordic/5 px-6 py-4 dark:border-white/10">
               <h2 className="text-lg font-semibold text-nordic dark:text-white">
-                {labels.deleteLabel}
+                {isActive ? labels.deactivate : labels.activate}
               </h2>
               <button
                 type="button"
-                disabled={isDeleting}
-                onClick={() => setConfirmDeleteOpen(false)}
+                disabled={isToggling}
+                onClick={() => setConfirmToggleOpen(false)}
                 aria-label={labels.cancel}
                 className="rounded-full p-2 text-nordic/60 transition-colors hover:bg-nordic/5 disabled:opacity-50 dark:text-gray-400 dark:hover:bg-white/10"
               >
@@ -759,13 +776,17 @@ export default function PropertyForm({
             <div className="flex items-start gap-4 p-6">
               <span
                 aria-hidden="true"
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400"
+                className={
+                  isActive
+                    ? "flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400"
+                    : "flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-mosque/10 text-mosque dark:bg-mosque/20 dark:text-hint"
+                }
               >
-                <Icon name="delete" className="h-6 w-6" />
+                <Icon name={isActive ? "block" : "eye"} className="h-6 w-6" />
               </span>
               <div className="min-w-0">
                 <p className="text-sm text-nordic/80 dark:text-gray-200">
-                  {labels.confirmDelete}
+                  {isActive ? labels.confirmDeactivate : labels.confirmActivate}
                 </p>
                 <p className="mt-1 truncate text-sm font-semibold text-nordic dark:text-white">
                   {form.title}
@@ -775,19 +796,29 @@ export default function PropertyForm({
             <footer className="flex items-center justify-end gap-3 border-t border-nordic/5 px-6 py-4 dark:border-white/10">
               <button
                 type="button"
-                disabled={isDeleting}
-                onClick={() => setConfirmDeleteOpen(false)}
+                disabled={isToggling}
+                onClick={() => setConfirmToggleOpen(false)}
                 className="rounded-lg px-4 py-2 text-sm font-medium text-nordic/70 transition-colors hover:bg-nordic/5 disabled:opacity-50 dark:text-gray-300 dark:hover:bg-white/10"
               >
                 {labels.cancel}
               </button>
               <button
                 type="button"
-                disabled={isDeleting}
-                onClick={handleDelete}
-                className="inline-flex items-center justify-center rounded-lg border border-red-600 bg-transparent px-4 py-2.5 text-sm font-medium whitespace-nowrap text-red-600 transition-colors hover:bg-red-500/10 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none disabled:opacity-60 dark:border-red-400 dark:text-red-400 dark:focus:ring-offset-[#0f231f]"
+                disabled={isToggling}
+                onClick={handleToggleActive}
+                className={
+                  isActive
+                    ? "inline-flex items-center justify-center rounded-lg border border-red-600 bg-transparent px-4 py-2.5 text-sm font-medium whitespace-nowrap text-red-600 transition-colors hover:bg-red-500/10 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none disabled:opacity-60 dark:border-red-400 dark:text-red-400 dark:focus:ring-offset-[#0f231f]"
+                    : "inline-flex items-center justify-center rounded-lg border border-mosque bg-transparent px-4 py-2.5 text-sm font-medium whitespace-nowrap text-mosque transition-colors hover:bg-mosque/5 focus:ring-2 focus:ring-mosque focus:ring-offset-2 focus:outline-none disabled:opacity-60 dark:focus:ring-offset-[#0f231f]"
+                }
               >
-                {isDeleting ? labels.deleting : labels.deleteLabel}
+                {isToggling
+                  ? isActive
+                    ? labels.deactivating
+                    : labels.activating
+                  : isActive
+                    ? labels.deactivate
+                    : labels.activate}
               </button>
             </footer>
           </div>
