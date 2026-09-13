@@ -88,7 +88,7 @@ export default function Navbar() {
             {isLoading ? (
               <span className="ml-2 h-9 w-9 animate-pulse rounded-full bg-nordic/10 pl-2 dark:bg-white/10" />
             ) : user ? (
-              <div ref={menuRef} className="relative ml-2 border-l border-nordic/10 pl-2 dark:border-white/10">
+              <div ref={menuRef} className="relative ml-2">
                 <button
                   aria-label={t("nav.profile")}
                   aria-haspopup="menu"
