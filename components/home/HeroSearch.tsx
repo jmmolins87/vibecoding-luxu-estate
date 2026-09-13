@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Icon from "@/components/ui/Icon";
 import { categoryFilters } from "@/data/properties";
 import FilterModal from "@/components/home/FilterModal";
 import FilterChips from "@/components/home/FilterChips";
+import { InlineLoader } from "@/components/ui/Loader";
 import {
   buildSearchParams,
   countActiveFilters,
@@ -19,34 +20,30 @@ interface HeroSearchProps {
   total: number;
 }
 
-/** Navega a la home con los filtros dados (fuente única de verdad = URL). */
-function pushFilters(
-  router: ReturnType<typeof useRouter>,
-  filters: PropertyFilters,
-  patch: Partial<PropertyFilters>,
-) {
-  const qs = buildSearchParams({ ...filters, ...patch });
-  router.push(qs ? `/?${qs}#market` : "/#market");
-}
-
 export default function HeroSearch({ filters, total }: HeroSearchProps) {
   const { t } = useTranslations();
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [query, setQuery] = useState(filters.city ?? "");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const activeCount = countActiveFilters(filters);
   const activeCategory = filters.type ?? "All";
 
+  const pushFilters = (patch: Partial<PropertyFilters>) => {
+    const qs = buildSearchParams({ ...filters, ...patch });
+    startTransition(() => router.push(qs ? `/?${qs}#market` : "/#market"));
+  };
+
   const submitSearch = () => {
     const city = query.trim() || undefined;
-    if (city === filters.city) return; // sin cambios → no navegar
-    pushFilters(router, filters, { city });
+    if (city === filters.city) return;
+    pushFilters({ city });
   };
 
   const selectCategory = (c: (typeof categoryFilters)[number]) => {
     const type = c === "All" ? undefined : (c as PropertyType);
-    if (type === filters.type) return; // sin cambios → no navegar
-    pushFilters(router, filters, { type });
+    if (type === filters.type) return;
+    pushFilters({ type });
   };
 
   return (
@@ -81,8 +78,10 @@ export default function HeroSearch({ filters, total }: HeroSearchProps) {
           />
           <button
             onClick={submitSearch}
-            className="absolute inset-y-2 right-2 flex items-center justify-center rounded-lg bg-mosque px-6 font-medium text-white shadow-lg shadow-mosque/20 transition-colors hover:bg-mosque/90"
+            disabled={isPending}
+            className="absolute inset-y-2 right-2 flex items-center justify-center gap-2 rounded-lg bg-mosque px-6 font-medium text-white shadow-lg shadow-mosque/20 transition-colors hover:bg-mosque/90 disabled:opacity-70"
           >
+            {isPending ? <InlineLoader /> : null}
             {t("hero.search")}
           </button>
         </div>
@@ -94,10 +93,11 @@ export default function HeroSearch({ filters, total }: HeroSearchProps) {
               <button
                 key={filter}
                 onClick={() => selectCategory(filter)}
+                disabled={isPending}
                 className={
                   activeCategory === filter
-                    ? "rounded-full bg-nordic px-5 py-2 text-sm font-medium whitespace-nowrap text-white shadow-lg shadow-nordic/10 transition-transform hover:-translate-y-0.5"
-                    : "rounded-full border border-nordic/5 bg-white px-5 py-2 text-sm font-medium whitespace-nowrap text-nordic-muted transition-all hover:border-mosque/50 hover:bg-mosque/5 hover:text-nordic dark:bg-white/5"
+                    ? "rounded-full bg-nordic px-5 py-2 text-sm font-medium whitespace-nowrap text-white shadow-lg shadow-nordic/10 transition-transform hover:-translate-y-0.5 disabled:opacity-70"
+                    : "rounded-full border border-nordic/5 bg-white px-5 py-2 text-sm font-medium whitespace-nowrap text-nordic-muted transition-all hover:border-mosque/50 hover:bg-mosque/5 hover:text-nordic disabled:opacity-50 dark:bg-white/5"
                 }
               >
                 {label}

@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { COOKIE_MAX_AGE, COOKIE_NAME, defaultLocale, isValidLocale } from "@/lib/i18n/config";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const cookieLocale = request.cookies.get(COOKIE_NAME)?.value;
   if (isValidLocale(cookieLocale)) {
     return NextResponse.next();

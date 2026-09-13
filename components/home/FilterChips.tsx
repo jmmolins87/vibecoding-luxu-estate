@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTransition } from "react";
 import Icon from "@/components/ui/Icon";
 import {
   buildSearchParams,
@@ -20,6 +21,7 @@ export default function FilterChips({ filters }: { filters: PropertyFilters }) {
   const { t } = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
   const chips: Chip[] = [];
   // El precio combina min+max en un solo chip → un if dedicado
@@ -98,23 +100,25 @@ export default function FilterChips({ filters }: { filters: PropertyFilters }) {
 
   const removeChip = (remove: Partial<PropertyFilters>) => {
     const status = searchParams.get("status") ?? undefined;
-    // El spread con `undefined` explícito quita el filtro;
-    // `buildSearchParams` omite vacíos y resetea a página 1.
     const qs = buildSearchParams({
       ...filters,
       ...remove,
       status: status as "sale" | "rent" | undefined,
     });
-    router.push(qs ? `/?${qs}#market` : "/#market");
+    startTransition(() => router.push(qs ? `/?${qs}#market` : "/#market"));
   };
 
   return (
     <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-2 pb-2">
+      {isPending && (
+        <span className="h-4 w-4 animate-spin rounded-full border-2 border-mosque/20 border-t-mosque" aria-hidden />
+      )}
       {chips.map((chip) => (
         <button
           key={chip.key}
           onClick={() => removeChip(chip.remove)}
-          className="flex items-center gap-1.5 rounded-full bg-mosque/10 px-3 py-1.5 text-xs font-medium text-mosque transition-colors hover:bg-mosque/20"
+          disabled={isPending}
+          className="flex items-center gap-1.5 rounded-full bg-mosque/10 px-3 py-1.5 text-xs font-medium text-mosque transition-colors hover:bg-mosque/20 disabled:opacity-50"
         >
           {chip.label}
           <Icon name="close" className="h-3.5 w-3.5" />

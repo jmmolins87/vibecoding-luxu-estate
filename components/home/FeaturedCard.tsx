@@ -30,6 +30,15 @@ export default function FeaturedCard({ property }: FeaturedCardProps) {
           </div>
         )}
         <SaveButton className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-nordic backdrop-blur-sm transition-all hover:bg-mosque hover:text-white dark:bg-black/60 dark:text-white" />
+        <div
+          className={
+            property.status === "rent"
+              ? "absolute bottom-4 left-4 rounded bg-mosque/90 px-3 py-1.5 text-xs font-bold tracking-wider text-white shadow-md"
+              : "absolute bottom-4 left-4 rounded bg-nordic/90 px-3 py-1.5 text-xs font-bold tracking-wider text-white shadow-md"
+          }
+        >
+          {property.status === "rent" ? t("propertyCard.forRent") : t("propertyCard.forSale")}
+        </div>
         {property.id === "glass-pavilion" && (
           <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent opacity-60" />
         )}

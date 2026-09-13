@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Icon from "@/components/ui/Icon";
+import { InlineLoader } from "@/components/ui/Loader";
 import {
   AMENITY_OPTIONS,
   PROPERTY_TYPES,
@@ -37,6 +38,7 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
   const { t } = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
   const [draft, setDraft] = useState<PropertyFilters>({});
   const [wasOpen, setWasOpen] = useState(false);
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -72,7 +74,7 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
       ...next,
       status: status as "sale" | "rent" | undefined,
     });
-    router.push(qs ? `/?${qs}` : "/");
+    startTransition(() => router.push(qs ? `/?${qs}` : "/"));
   };
 
   const update = (patch: Partial<PropertyFilters>, immediate = true) => {
@@ -88,7 +90,7 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
 
   const clearAll = () => {
     setDraft({});
-    router.push("/");
+    startTransition(() => router.push("/"));
   };
 
   const toggleAmenity = (value: string) => {
@@ -403,7 +405,8 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
         <footer className="sticky bottom-0 z-30 flex items-center justify-between border-t border-nordic/5 bg-white px-8 py-6 dark:border-white/10 dark:bg-[#0f231f]">
           <button
             onClick={clearAll}
-            className="text-sm font-medium text-nordic-muted underline decoration-nordic/20 underline-offset-4 transition-colors hover:text-nordic dark:hover:text-white"
+            disabled={isPending}
+            className="text-sm font-medium text-nordic-muted underline decoration-nordic/20 underline-offset-4 transition-colors hover:text-nordic disabled:opacity-50 dark:hover:text-white"
           >
             {t("filters.clearAllFilters")}
           </button>
@@ -411,6 +414,7 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
             onClick={onClose}
             className="flex transform items-center gap-2 rounded-lg bg-mosque px-8 py-3 font-medium text-white shadow-lg shadow-mosque/30 transition-all hover:bg-mosque/90 active:scale-95"
           >
+            {isPending && <InlineLoader />}
             {t("filters.showHomes", { count: total })}
             <Icon name="arrow" className="h-4 w-4" />
           </button>

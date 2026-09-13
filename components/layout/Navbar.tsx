@@ -68,18 +68,18 @@ export default function Navbar() {
               <Icon name="bell" className="h-6 w-6" />
               <span className="absolute top-0 right-0 h-2 w-2 rounded-full border-2 border-clearday bg-red-500 dark:border-[#0f231f]" />
             </button>
+            <LanguageSelector />
             <button
               aria-label={t("nav.profile")}
-              className="ml-2 flex items-center gap-4 border-l border-nordic/10 pl-4 dark:border-white/10"
+              className="ml-2 flex items-center gap-2 border-l border-nordic/10 pl-2 dark:border-white/10"
             >
-              <LanguageSelector />
-              <div className="h-9 w-9 overflow-hidden rounded-full bg-gray-200 ring-2 ring-transparent transition-all hover:ring-mosque">
+              <span className="h-9 w-9 overflow-hidden rounded-full bg-gray-200 ring-2 ring-transparent transition-all hover:ring-mosque">
                 <img
                   alt={t("nav.profile")}
                   className="h-full w-full object-cover"
                   src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80"
                 />
-              </div>
+              </span>
             </button>
             <button
               aria-label={t("nav.menu")}
