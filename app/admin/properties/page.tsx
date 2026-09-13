@@ -4,6 +4,7 @@ import PropertiesTable from "@/components/admin/PropertiesTable";
 import AdminSearch from "@/components/admin/AdminSearch";
 import Pagination from "@/components/admin/Pagination";
 import { getAdminProperties } from "@/lib/actions/admin";
+import { withMinDuration } from "@/lib/delay";
 import { getLocale } from "@/lib/i18n/server";
 import { createTranslator, getDictionary } from "@/lib/i18n/dictionaries";
 
@@ -18,11 +19,13 @@ export default async function AdminPropertiesPage({
   const t = createTranslator(getDictionary(locale));
   const params = await searchParams;
   const query = params.q?.trim() ?? "";
-  const { rows, total, totalPages, page } = await getAdminProperties({
-    page: Number(params.page ?? 1),
-    pageSize: PAGE_SIZE,
-    query,
-  });
+  const { rows, total, totalPages, page } = await withMinDuration(
+    getAdminProperties({
+      page: Number(params.page ?? 1),
+      pageSize: PAGE_SIZE,
+      query,
+    }),
+  );
 
   return (
     <div>

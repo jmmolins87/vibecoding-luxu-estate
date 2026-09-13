@@ -10,6 +10,7 @@ import MortgageEstimate from "@/components/property/MortgageEstimate";
 import PropertyMapWrapper from "@/components/property/PropertyMapWrapper";
 import Icon from "@/components/ui/Icon";
 import { getAllPropertySlugs, getPropertyBySlug } from "@/lib/properties";
+import { withMinDuration } from "@/lib/delay";
 import { formatPrice } from "@/types/property";
 import { getLocale } from "@/lib/i18n/server";
 import { getDictionary, createTranslator } from "@/lib/i18n/dictionaries";
@@ -83,7 +84,10 @@ export default async function PropertyPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [property, locale] = await Promise.all([getPropertyBySlug(slug), getLocale()]);
+  // Una sola ventana mínima de carga (el metadato reutiliza la caché).
+  const [property, locale] = await withMinDuration(
+    Promise.all([getPropertyBySlug(slug), getLocale()]),
+  );
   const dict = getDictionary(locale);
   const t = createTranslator(dict);
 

@@ -1,13 +1,14 @@
 import Link from "next/link";
 import StatCard from "@/components/admin/StatCard";
 import { getAdminStats } from "@/lib/actions/admin";
+import { withMinDuration } from "@/lib/delay";
 import { getLocale } from "@/lib/i18n/server";
 import { createTranslator, getDictionary } from "@/lib/i18n/dictionaries";
 
 export default async function AdminDashboardPage() {
   const locale = await getLocale();
   const t = createTranslator(getDictionary(locale));
-  const stats = await getAdminStats();
+  const stats = await withMinDuration(getAdminStats());
 
   return (
     <div>

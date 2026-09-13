@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import SavedGrid from "@/components/saved/SavedGrid";
 import { createAuthServerSupabaseClient } from "@/lib/supabase/server";
 import { getSavedProperties } from "@/lib/actions/saved";
+import { withMinDuration } from "@/lib/delay";
 import { getLocale } from "@/lib/i18n/server";
 import { createTranslator, getDictionary } from "@/lib/i18n/dictionaries";
 
@@ -21,7 +22,7 @@ export default async function SavedPage() {
 
   const locale = await getLocale();
   const t = createTranslator(getDictionary(locale));
-  const properties = await getSavedProperties();
+  const properties = await withMinDuration(getSavedProperties());
 
   return (
     <SavedGrid

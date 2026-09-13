@@ -3,6 +3,7 @@ import UsersTable from "@/components/admin/UsersTable";
 import AdminSearch from "@/components/admin/AdminSearch";
 import Pagination from "@/components/admin/Pagination";
 import { getAdminUsers } from "@/lib/actions/admin";
+import { withMinDuration } from "@/lib/delay";
 import { getLocale } from "@/lib/i18n/server";
 import { createTranslator, getDictionary } from "@/lib/i18n/dictionaries";
 
@@ -17,11 +18,13 @@ export default async function AdminUsersPage({
   const t = createTranslator(getDictionary(locale));
   const params = await searchParams;
   const query = params.q?.trim() ?? "";
-  const { users, total, totalPages, page } = await getAdminUsers({
-    page: Number(params.page ?? 1),
-    perPage: PAGE_SIZE,
-    query,
-  });
+  const { users, total, totalPages, page } = await withMinDuration(
+    getAdminUsers({
+      page: Number(params.page ?? 1),
+      perPage: PAGE_SIZE,
+      query,
+    }),
+  );
 
   return (
     <div>

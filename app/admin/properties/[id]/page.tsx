@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import PropertyForm from "@/components/admin/PropertyForm";
 import { getAdminPropertyById } from "@/lib/actions/admin";
+import { withMinDuration } from "@/lib/delay";
 import { getLocale } from "@/lib/i18n/server";
 import { createTranslator, getDictionary } from "@/lib/i18n/dictionaries";
 
@@ -12,7 +13,7 @@ export default async function AdminEditPropertyPage({
   const { id } = await params;
   const locale = await getLocale();
   const t = createTranslator(getDictionary(locale));
-  const property = await getAdminPropertyById(id);
+  const property = await withMinDuration(getAdminPropertyById(id));
   if (!property) notFound();
 
   return (

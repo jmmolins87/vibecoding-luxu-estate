@@ -5,6 +5,7 @@ import {
   getPaginatedProperties,
 } from "@/lib/properties";
 import { parseFilters, hasActiveFilters } from "@/lib/filters";
+import { withMinDuration } from "@/lib/delay";
 
 interface HomeSearchParams {
   page?: string;
@@ -38,14 +39,17 @@ export default async function Home({
   // Con filtros/búsqueda activos no se muestran las featured (confunden al usuario).
   const showFeatured = !hasActiveFilters(filters);
 
-  const [featuredResult, market] = await Promise.all([
-    showFeatured ? getFeaturedProperties() : Promise.resolve(null),
-    getPaginatedProperties({
-      page: Number.isFinite(page) ? page : 1,
-      pageSize: DEFAULT_PAGE_SIZE,
-      ...filters,
-    }),
-  ]);
+  // Una sola ventana mínima de carga para toda la navegación (loader/skeleton ≥500ms).
+  const [featuredResult, market] = await withMinDuration(
+    Promise.all([
+      showFeatured ? getFeaturedProperties() : Promise.resolve(null),
+      getPaginatedProperties({
+        page: Number.isFinite(page) ? page : 1,
+        pageSize: DEFAULT_PAGE_SIZE,
+        ...filters,
+      }),
+    ]),
+  );
 
   return (
     <HomeScreen
