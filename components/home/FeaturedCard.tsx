@@ -18,7 +18,7 @@ export default function FeaturedCard({ property }: FeaturedCardProps) {
       href={`/property/${property.slug}`}
       className="group relative block cursor-pointer overflow-hidden rounded-xl bg-white shadow-soft dark:bg-white/5"
     >
-      <div className="relative aspect-[4/3] w-full overflow-hidden">
+      <div className="relative aspect-4/3 w-full overflow-hidden">
         <img
           alt={property.imagesAlt[0]}
           src={property.images[0]}
@@ -40,7 +40,7 @@ export default function FeaturedCard({ property }: FeaturedCardProps) {
           {property.status === "rent" ? t("propertyCard.forRent") : t("propertyCard.forSale")}
         </div>
         {property.id === "glass-pavilion" && (
-          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent opacity-60" />
+          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/60 to-transparent opacity-60" />
         )}
       </div>
 

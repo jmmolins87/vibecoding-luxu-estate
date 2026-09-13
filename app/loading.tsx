@@ -44,7 +44,7 @@ export default function HomeLoading() {
               key={i}
               className="animate-pulse overflow-hidden rounded-xl bg-white p-0 shadow-card dark:bg-white/5"
             >
-              <div className="aspect-[4/3] bg-nordic/10" />
+              <div className="aspect-4/3 bg-nordic/10" />
               <div className="space-y-3 p-4">
                 <div className="h-5 w-24 rounded bg-nordic/10" />
                 <div className="h-4 w-full rounded bg-nordic/10" />
