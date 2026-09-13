@@ -18,6 +18,8 @@ interface FilterModalProps {
   open: boolean;
   onClose: () => void;
   total: number;
+  /** Ruta base sobre la que se aplican los filtros (por defecto, la home). */
+  basePath?: string;
 }
 
 const SLIDER_MAX = 10_000_000;
@@ -34,7 +36,12 @@ function paramsRecord(sp: URLSearchParams): Record<string, string> {
  * Los filtros viven en la URL (fuente única de verdad): cada cambio hace
  * `router.push` y la página se re-renderiza en el servidor.
  */
-export default function FilterModal({ open, onClose, total }: FilterModalProps) {
+export default function FilterModal({
+  open,
+  onClose,
+  total,
+  basePath = "/",
+}: FilterModalProps) {
   const { t } = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -74,7 +81,14 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
       ...next,
       status: status as "sale" | "rent" | undefined,
     });
-    startTransition(() => router.push(qs ? `/?${qs}` : "/"));
+    // Preserva la búsqueda de texto (`q`, solo existe en el admin).
+    const q = searchParams.get("q");
+    const suffix = [qs, q ? `q=${encodeURIComponent(q)}` : ""]
+      .filter(Boolean)
+      .join("&");
+    startTransition(() =>
+      router.push(suffix ? `${basePath}?${suffix}` : basePath),
+    );
   };
 
   const update = (patch: Partial<PropertyFilters>, immediate = true) => {
@@ -90,7 +104,10 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
 
   const clearAll = () => {
     setDraft({});
-    startTransition(() => router.push("/"));
+    const q = searchParams.get("q");
+    startTransition(() =>
+      router.push(q ? `${basePath}?q=${encodeURIComponent(q)}` : basePath),
+    );
   };
 
   const toggleAmenity = (value: string) => {

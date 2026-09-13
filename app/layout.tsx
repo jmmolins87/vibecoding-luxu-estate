@@ -5,6 +5,7 @@ import { getLocale } from "@/lib/i18n/server";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { I18nProvider } from "@/lib/i18n/client";
 import { AuthProvider } from "@/lib/auth/AuthProvider";
+import { ToastProvider } from "@/components/ui/Toast";
 import { SavedProvider } from "@/components/saved/SavedProvider";
 import { getSavedPropertyIds } from "@/lib/actions/saved";
 import AuthModalHost from "@/components/auth/AuthModalHost";
@@ -29,12 +30,14 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <I18nProvider locale={locale} dict={dict}>
           <AuthProvider>
-            <SavedProvider initialIds={initialSavedIds}>
-              {children}
-              <Suspense>
-                <AuthModalHost />
-              </Suspense>
-            </SavedProvider>
+            <ToastProvider>
+              <SavedProvider initialIds={initialSavedIds}>
+                {children}
+                <Suspense>
+                  <AuthModalHost />
+                </Suspense>
+              </SavedProvider>
+            </ToastProvider>
           </AuthProvider>
         </I18nProvider>
       </body>

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createAuthServerSupabaseClient, createServiceSupabaseClient } from "@/lib/supabase/server";
 import { ADMIN_ROLE, type UserRole } from "@/lib/auth/roles";
 import type { Property } from "@/types/property";
+import type { PropertyFilters } from "@/lib/filters";
 
 /* ------------------------------------------------------------------ */
 /* Guardias                                                            */
@@ -74,7 +75,7 @@ export interface AdminPropertyRow {
 }
 
 export async function getAdminProperties(
-  options?: { page?: number; pageSize?: number; query?: string },
+  options?: { page?: number; pageSize?: number; query?: string } & PropertyFilters,
 ): Promise<{
   rows: AdminPropertyRow[];
   total: number;
@@ -100,6 +101,24 @@ export async function getAdminProperties(
       base = base.or(
         `title.ilike.${like},location.ilike.${like},address.ilike.${like},id.ilike.${like}`,
       );
+    }
+    // Filtros de la modal compartida con la web (misma semántica).
+    const f = options ?? {};
+    if (f.status === "sale" || f.status === "rent") {
+      base = base.eq("status", f.status);
+    }
+    const city = f.city?.trim();
+    if (city) {
+      const like = `%${escapeLike(city)}%`;
+      base = base.or(`location.ilike.${like},address.ilike.${like}`);
+    }
+    if (typeof f.minPrice === "number") base = base.gte("price", f.minPrice);
+    if (typeof f.maxPrice === "number") base = base.lte("price", f.maxPrice);
+    if (typeof f.beds === "number") base = base.gte("beds", f.beds);
+    if (typeof f.baths === "number") base = base.gte("baths", f.baths);
+    if (f.type) base = base.eq("type", f.type);
+    if (f.amenities && f.amenities.length > 0) {
+      base = base.contains("amenities", f.amenities);
     }
     return base;
   };
@@ -312,13 +331,15 @@ export async function deleteProperty(id: string): Promise<{ ok: true }> {
 export interface AdminUserRow {
   id: string;
   email: string;
+  displayName: string | null;
+  avatarUrl: string | null;
   createdAt: string;
   lastSignInAt: string | null;
   role: UserRole;
 }
 
 export async function getAdminUsers(
-  options?: { page?: number; perPage?: number; query?: string },
+  options?: { page?: number; perPage?: number; query?: string; role?: UserRole },
 ): Promise<{
   users: AdminUserRow[];
   total: number;
@@ -331,6 +352,7 @@ export async function getAdminUsers(
 
   const perPage = clampPageSize(options?.perPage ?? 10);
   const query = options?.query?.trim() ?? "";
+  const roleFilter = options?.role;
 
   const buildBase = () => {
     let base = service
@@ -338,6 +360,9 @@ export async function getAdminUsers(
       .select("user_id, role, email", { count: "exact" });
     if (query !== "") {
       base = base.ilike("email", `%${escapeLike(query)}%`);
+    }
+    if (roleFilter === "admin" || roleFilter === "user") {
+      base = base.eq("role", roleFilter);
     }
     return base;
   };
@@ -366,13 +391,22 @@ export async function getAdminUsers(
     }),
   );
 
-  const users: AdminUserRow[] = rows.map((r, i) => ({
-    id: r.user_id,
-    email: r.email ?? metas[i]?.email ?? "—",
-    createdAt: metas[i]?.created_at ?? "",
-    lastSignInAt: metas[i]?.last_sign_in_at ?? null,
-    role: r.role ?? "user",
-  }));
+  const users: AdminUserRow[] = rows.map((r, i) => {
+    const meta = (metas[i]?.user_metadata ?? {}) as Record<string, unknown>;
+    const metaName = meta.full_name ?? meta.name;
+    const avatar = meta.avatar_url ?? meta.picture;
+    return {
+      id: r.user_id,
+      email: r.email ?? metas[i]?.email ?? "—",
+      displayName:
+        typeof metaName === "string" && metaName.length > 0 ? metaName : null,
+      avatarUrl:
+        typeof avatar === "string" && avatar.length > 0 ? avatar : null,
+      createdAt: metas[i]?.created_at ?? "",
+      lastSignInAt: metas[i]?.last_sign_in_at ?? null,
+      role: r.role ?? "user",
+    };
+  });
 
   return { users, total, totalPages, page, perPage };
 }
@@ -394,6 +428,70 @@ export async function updateUserRole(
   if (error) throw new Error(error.message);
 
   revalidatePath("/admin");
+  revalidatePath("/admin/users");
+  return { ok: true };
+}
+
+/**
+ * Edita nombre, correo y/o contraseña de un usuario vía Auth Admin API.
+ * El email de `user_roles` se sincroniza solo (trigger) y la contraseña
+ * nunca sale de `auth.users`. Campos vacíos = sin cambio, salvo el nombre
+ * (vacío lo borra). Exige sesión admin.
+ */
+export async function updateAdminUser(
+  userId: string,
+  input: { fullName?: string; email?: string; password?: string },
+): Promise<{ ok: true }> {
+  await requireAdminUserId();
+  const service = requireService();
+
+  const email = input.email?.trim() ?? "";
+  const password = input.password ?? "";
+  if (email !== "" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new Error("Correo no válido.");
+  }
+  if (password !== "" && password.length < 6) {
+    throw new Error("La contraseña debe tener al menos 6 caracteres.");
+  }
+
+  const attrs: {
+    email?: string;
+    password?: string;
+    user_metadata?: Record<string, unknown>;
+  } = {};
+  if (email !== "") attrs.email = email;
+  if (password !== "") attrs.password = password;
+  if (input.fullName !== undefined) {
+    const { data } = await service.auth.admin.getUserById(userId);
+    const prev = (data.user?.user_metadata ?? {}) as Record<string, unknown>;
+    const fullName = input.fullName.trim();
+    attrs.user_metadata = {
+      ...prev,
+      full_name: fullName === "" ? null : fullName,
+    };
+  }
+  if (Object.keys(attrs).length === 0) throw new Error("Sin cambios.");
+
+  const { error } = await service.auth.admin.updateUserById(userId, attrs);
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin/users");
+  return { ok: true };
+}
+
+/**
+ * Elimina un usuario de Auth (su fila en `user_roles` cae en cascada).
+ * No permite autoeliminarse. Exige sesión admin.
+ */
+export async function deleteAdminUser(userId: string): Promise<{ ok: true }> {
+  const adminId = await requireAdminUserId();
+  if (userId === adminId) {
+    throw new Error("No puedes eliminar tu propio usuario.");
+  }
+  const service = requireService();
+  const { error } = await service.auth.admin.deleteUser(userId);
+  if (error) throw new Error(error.message);
+
   revalidatePath("/admin/users");
   return { ok: true };
 }

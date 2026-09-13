@@ -67,6 +67,8 @@ export default async function AdminEditPropertyPage({
             create: t("admin.create"),
             cancel: t("admin.cancel"),
             saving: t("admin.saving"),
+            propertyCreated: t("admin.propertyCreated"),
+            propertyUpdated: t("admin.propertyUpdated"),
             errorDefault: t("admin.errorDefault"),
           }}
         />

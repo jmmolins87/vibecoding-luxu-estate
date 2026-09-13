@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
+import Icon from "@/components/ui/Icon";
 
 /**
  * Buscador que filtra en el BACKEND vía `?q=`: reescribe la URL con debounce
@@ -38,14 +39,20 @@ export default function AdminSearch({
   }, [value, pathname, router, searchParams]);
 
   return (
-    <div className="relative w-full sm:max-w-sm">
+    <div className="group relative w-full md:w-80">
+      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+        <Icon
+          name="search"
+          className="h-5 w-5 text-nordic/40 group-focus-within:text-mosque"
+        />
+      </div>
       <input
         type="search"
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
         aria-label={ariaLabel}
-        className="w-full rounded-lg border border-nordic/10 bg-white py-2.5 pr-4 pl-4 text-sm text-nordic outline-none placeholder:text-nordic/30 focus:border-mosque focus:ring-2 focus:ring-mosque/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500"
+        className="block w-full rounded-lg border-none bg-white py-2.5 pr-10 pl-10 text-sm text-nordic shadow-soft transition-all outline-none placeholder:text-nordic/30 focus:bg-white focus:ring-2 focus:ring-mosque dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500 dark:focus:ring-hint/40"
       />
       {isPending && (
         <span aria-hidden="true" className="absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 animate-spin rounded-full border-2 border-mosque/30 border-t-mosque" />

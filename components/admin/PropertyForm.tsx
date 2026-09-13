@@ -8,6 +8,7 @@ import {
   type AdminPropertyDetail,
   type PropertyFormInput,
 } from "@/lib/actions/admin";
+import { useToast } from "@/components/ui/Toast";
 
 interface FormLabels {
   id: string;
@@ -52,6 +53,8 @@ interface FormLabels {
   create: string;
   cancel: string;
   saving: string;
+  propertyCreated: string;
+  propertyUpdated: string;
   errorDefault: string;
 }
 
@@ -109,6 +112,7 @@ export default function PropertyForm({
   labels: FormLabels;
 }) {
   const router = useRouter();
+  const { notify } = useToast();
   const [form, setForm] = useState<PropertyFormInput>(() => toFormState(initial));
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -122,8 +126,13 @@ export default function PropertyForm({
     setError(null);
     startTransition(async () => {
       try {
-        if (propertyId) await updateProperty(propertyId, form);
-        else await createProperty(form);
+        if (propertyId) {
+          await updateProperty(propertyId, form);
+          notify(labels.propertyUpdated);
+        } else {
+          await createProperty(form);
+          notify(labels.propertyCreated);
+        }
         router.push("/admin/properties");
         router.refresh();
       } catch (err) {

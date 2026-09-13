@@ -11,6 +11,8 @@ import {
 } from "react";
 import { getSavedPropertyIds, toggleSavedProperty } from "@/lib/actions/saved";
 import { useAuth } from "@/lib/auth/AuthProvider";
+import { useToast } from "@/components/ui/Toast";
+import { useTranslations } from "@/lib/i18n/client";
 
 interface SavedContextValue {
   /** Ids guardados por el usuario actual (vacío para invitados). */
@@ -28,6 +30,8 @@ export function SavedProvider({
   children: ReactNode;
 }) {
   const { user } = useAuth();
+  const { notify } = useToast();
+  const { t } = useTranslations();
   const [savedIds, setSavedIds] = useState<Set<string>>(() => new Set(initialIds));
   const [prevUserId, setPrevUserId] = useState<string | undefined>(() => user?.id);
 
@@ -66,6 +70,7 @@ export function SavedProvider({
         else next.delete(propertyId);
         return next;
       });
+      notify(saved ? t("savedToast.added") : t("savedToast.removed"));
     } catch {
       // Revierte el optimismo si falla (p. ej. pierde la sesión).
       setSavedIds((prev) => {
@@ -74,8 +79,9 @@ export function SavedProvider({
         else next.add(propertyId);
         return next;
       });
+      notify(t("savedToast.error"), "error");
     }
-  }, []);
+  }, [notify, t]);
 
   const value = useMemo<SavedContextValue>(
     () => ({ savedIds, toggle }),
