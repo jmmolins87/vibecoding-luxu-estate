@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useTransition, type FormEvent, type ReactN
 import { useRouter } from "next/navigation";
 import {
   createProperty,
+  deleteProperty,
   updateProperty,
   type AdminPropertyDetail,
   type PropertyFormInput,
@@ -76,6 +77,10 @@ export interface PropertyFormLabels extends GalleryUploaderLabels {
   lng: string;
   cancel: string;
   saving: string;
+  deleteLabel: string;
+  deleting: string;
+  confirmDelete: string;
+  propertyDeleted: string;
   imageRequired: string;
   propertyCreated: string;
   propertyUpdated: string;
@@ -186,6 +191,23 @@ function parsePriceText(v: string): number {
 }
 
 /**
+ * Formatea el precio mientras se escribe: agrupa los miles con coma
+ * (1,000,000) y conserva el punto decimal con hasta 2 decimales.
+ * Mantiene el "." a medio escribir para no romper la edición.
+ */
+function formatPriceLive(raw: string): string {
+  const cleaned = raw.replace(/[^0-9.]/g, "");
+  if (cleaned === "") return "";
+  const firstDot = cleaned.indexOf(".");
+  const intPart = firstDot === -1 ? cleaned : cleaned.slice(0, firstDot);
+  const decPart =
+    firstDot === -1 ? null : cleaned.slice(firstDot + 1).replace(/\./g, "").slice(0, 2);
+  const intDigits = intPart.replace(/^0+(?=\d)/, "");
+  const grouped = intDigits.replace(/\B(?=(\d{3})+(?!\d))/g, ",") || "0";
+  return decPart === null ? grouped : `${grouped}.${decPart}`;
+}
+
+/**
  * Formulario crear/editar propiedad (diseño `add_edit_property_form`):
  * cabecera con breadcrumb + Save Draft / Save Property, grid 8+4 con
  * Basic Information, Description, Gallery, Location, Details, Amenities
@@ -220,6 +242,8 @@ export default function PropertyForm({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [locating, setLocating] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [isDeleting, startDeleting] = useTransition();
   const isEdit = Boolean(propertyId);
   // Dirección/ciudad iniciales: solo se geocodifica cuando el usuario las cambia.
   const initialGeoRef = useRef({
@@ -255,6 +279,31 @@ export default function PropertyForm({
     return () => clearTimeout(timer);
   }, [form.address, form.location]);
 
+  // Cerrar el modal de borrado con ESC.
+  useEffect(() => {
+    if (!confirmDeleteOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !isDeleting) setConfirmDeleteOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [confirmDeleteOpen, isDeleting]);
+
+  function handleDelete() {
+    if (!propertyId) return;
+    setConfirmDeleteOpen(false);
+    setError(null);
+    startDeleting(async () => {
+      try {
+        await deleteProperty(propertyId);
+        notify(labels.propertyDeleted);
+        router.push("/admin/properties");
+        router.refresh();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : labels.errorDefault);
+      }
+    });
+  }
   function set<K extends keyof PropertyFormInput>(key: K, value: PropertyFormInput[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
@@ -321,9 +370,9 @@ export default function PropertyForm({
     : null;
 
   return (
-    <div className="pb-20 md:pb-0">
-      {/* Cabecera: breadcrumb + título + acciones */}
-      <header className="mb-10 flex flex-col justify-between gap-6 border-b border-gray-200 pb-8 md:flex-row md:items-end dark:border-white/10">
+    <div className="pb-28">
+      {/* Cabecera: breadcrumb + título */}
+      <header className="mb-10 border-b border-gray-200 pb-8 dark:border-white/10">
         <div className="space-y-4">
           <nav aria-label="Breadcrumb" className="flex">
             <ol className="flex items-center space-x-2 text-sm font-medium text-gray-500 dark:text-gray-400">
@@ -348,17 +397,6 @@ export default function PropertyForm({
               {labels.subtitle}
             </p>
           </div>
-        </div>
-        <div className="hidden gap-3 md:flex">
-          <button
-            type="submit"
-            form="pf-form"
-            disabled={isPending || !isDirty}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-mosque bg-transparent px-4 py-2.5 text-sm font-medium whitespace-nowrap text-mosque transition-colors hover:bg-mosque/5 focus:ring-2 focus:ring-mosque focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-[#0f231f]"
-          >
-            <Icon name="check" className="h-4 w-4" />
-            {isPending ? labels.saving : labels.saveProperty}
-          </button>
         </div>
       </header>
 
@@ -393,13 +431,30 @@ export default function PropertyForm({
                     id="pf-price" type="text" inputMode="decimal" required
                     value={priceText} placeholder={labels.pricePh}
                     onChange={(e) => {
-                      const raw = e.target.value;
-                      if (/^[0-9.,\s]*$/.test(raw)) {
-                        setPriceText(raw);
-                        set("price", parsePriceText(raw));
-                      }
+                      const input = e.target;
+                      const raw = input.value;
+                      if (!/^[0-9.,\s]*$/.test(raw)) return;
+                      const caret = input.selectionStart ?? raw.length;
+                      // Dígitos/punto antes del cursor para recolocarlo tras agrupar.
+                      const before = raw.slice(0, caret).replace(/[^0-9.]/g, "");
+                      const formatted = formatPriceLive(raw);
+                      setPriceText(formatted);
+                      set("price", parsePriceText(formatted));
+                      requestAnimationFrame(() => {
+                        const el = document.getElementById("pf-price") as HTMLInputElement | null;
+                        if (!el) return;
+                        let seen = 0;
+                        let pos = formatted.length;
+                        for (let i = 0; i < formatted.length; i++) {
+                          if (/[0-9.]/.test(formatted[i])) seen += 1;
+                          if (seen >= before.length) {
+                            pos = i + 1;
+                            break;
+                          }
+                        }
+                        el.setSelectionRange(pos, pos);
+                      });
                     }}
-                    onFocus={() => setPriceText(form.price ? String(form.price) : "")}
                     onBlur={() => setPriceText(formatPriceText(form.price))}
                     className={`${inputCls} pr-4 pl-7 text-base font-medium`}
                   />
@@ -553,7 +608,7 @@ export default function PropertyForm({
           </SectionCard>
 
           <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm dark:border-white/10 dark:bg-white/5">
-            <div className="flex items-center gap-3 border-b border-hint/30 bg-gradient-to-r from-hint/10 to-transparent px-6 py-4 dark:border-white/5">
+            <div className="flex items-center gap-3 border-b border-hint/30 bg-linear-to-r from-hint/10 to-transparent px-6 py-4 dark:border-white/5">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-hint text-nordic">
                 <Icon name="area" className="h-5 w-5" />
               </div>
@@ -648,24 +703,96 @@ export default function PropertyForm({
 
         </div>
 
-        {/* Barra móvil fija */}
-        <div className="fixed right-0 bottom-0 left-0 z-40 flex gap-3 border-t border-gray-200 bg-white p-4 shadow-xl md:hidden dark:border-white/10 dark:bg-[#0f231f]">
-          <button
-            type="button"
-            onClick={() => router.push("/admin/properties")}
-            className="flex-1 rounded-lg border border-gray-300 bg-white py-3 font-medium text-nordic dark:border-white/10 dark:bg-white/5 dark:text-gray-200"
-          >
-            {labels.cancel}
-          </button>
-          <button
-            type="submit"
-            disabled={isPending || !isDirty}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-mosque bg-transparent py-3 font-medium text-mosque transition-colors hover:bg-mosque/5 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isPending ? labels.saving : labels.saveProperty}
-          </button>
+        {/* Barra inferior fija a ancho completo, botones dentro del container */}
+        <div className="fixed right-0 bottom-0 left-0 z-30 border-t border-gray-200 bg-white/95 shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.15)] backdrop-blur dark:border-white/10 dark:bg-[#0f231f]/95">
+          <div className="mx-auto flex w-full max-w-7xl items-center justify-end gap-3 px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6 lg:px-8">
+            {isEdit && (
+              <button
+                type="button"
+                onClick={() => setConfirmDeleteOpen(true)}
+                disabled={isPending || isDeleting}
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-transparent px-4 py-2.5 text-sm font-medium whitespace-nowrap text-red-600 transition-colors hover:bg-red-500/10 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-red-400 dark:text-red-400 dark:focus:ring-offset-[#0f231f]"
+              >
+                <Icon name="delete" className="h-4 w-4" />
+                {isDeleting ? labels.deleting : labels.deleteLabel}
+              </button>
+            )}
+            <button
+              type="submit"
+              form="pf-form"
+              disabled={isPending || isDeleting || !isDirty}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-mosque px-6 py-2.5 text-sm font-medium whitespace-nowrap text-white transition-colors hover:bg-mosque/90 focus:ring-2 focus:ring-mosque focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-[#0f231f]"
+            >
+              <Icon name="check" className="h-4 w-4" />
+              {isPending ? labels.saving : labels.saveProperty}
+            </button>
+          </div>
         </div>
       </form>
+
+      {confirmDeleteOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          role="alertdialog"
+          aria-modal="true"
+          aria-label={labels.deleteLabel}
+        >
+          <div
+            className="absolute inset-0 bg-nordic/40 backdrop-blur-sm"
+            onClick={() => !isDeleting && setConfirmDeleteOpen(false)}
+          />
+          <div className="relative w-full max-w-md overflow-hidden rounded-xl bg-white shadow-2xl dark:bg-[#0f231f]">
+            <header className="flex items-center justify-between border-b border-nordic/5 px-6 py-4 dark:border-white/10">
+              <h2 className="text-lg font-semibold text-nordic dark:text-white">
+                {labels.deleteLabel}
+              </h2>
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => setConfirmDeleteOpen(false)}
+                aria-label={labels.cancel}
+                className="rounded-full p-2 text-nordic/60 transition-colors hover:bg-nordic/5 disabled:opacity-50 dark:text-gray-400 dark:hover:bg-white/10"
+              >
+                <Icon name="close" className="h-5 w-5" />
+              </button>
+            </header>
+            <div className="flex items-start gap-4 p-6">
+              <span
+                aria-hidden="true"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400"
+              >
+                <Icon name="delete" className="h-6 w-6" />
+              </span>
+              <div className="min-w-0">
+                <p className="text-sm text-nordic/80 dark:text-gray-200">
+                  {labels.confirmDelete}
+                </p>
+                <p className="mt-1 truncate text-sm font-semibold text-nordic dark:text-white">
+                  {form.title}
+                </p>
+              </div>
+            </div>
+            <footer className="flex items-center justify-end gap-3 border-t border-nordic/5 px-6 py-4 dark:border-white/10">
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => setConfirmDeleteOpen(false)}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-nordic/70 transition-colors hover:bg-nordic/5 disabled:opacity-50 dark:text-gray-300 dark:hover:bg-white/10"
+              >
+                {labels.cancel}
+              </button>
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={handleDelete}
+                className="inline-flex items-center justify-center rounded-lg border border-red-600 bg-transparent px-4 py-2.5 text-sm font-medium whitespace-nowrap text-red-600 transition-colors hover:bg-red-500/10 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none disabled:opacity-60 dark:border-red-400 dark:text-red-400 dark:focus:ring-offset-[#0f231f]"
+              >
+                {isDeleting ? labels.deleting : labels.deleteLabel}
+              </button>
+            </footer>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

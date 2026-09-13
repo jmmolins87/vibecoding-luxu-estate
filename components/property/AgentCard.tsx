@@ -45,7 +45,7 @@ export default function AgentCard({ property }: AgentCardProps) {
           </div>
           <SaveButton
             propertyId={property.id}
-            className="mt-1 flex-shrink-0 rounded-full bg-mosque/10 p-2.5 text-nordic transition-colors hover:bg-red-50 hover:text-red-500 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+            className="mt-1 shrink-0 rounded-full bg-mosque/10 p-2.5 text-nordic transition-colors hover:bg-red-50 hover:text-red-500 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-red-900/20 dark:hover:text-red-400"
           />
         </div>
       </div>

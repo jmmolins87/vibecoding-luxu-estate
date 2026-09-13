@@ -80,8 +80,8 @@ export default function AdminTopNav({
   }
 
   return (
-    <nav className="border-b border-nordic/5 bg-white px-4 sm:px-6 lg:px-8 dark:border-white/5 dark:bg-[#0f231f]">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between">
+    <nav className="sticky top-0 z-50 border-b border-nordic/5 bg-white/95 backdrop-blur-md dark:border-white/5 dark:bg-[#0f231f]/95">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-12">
           <Link
             href="/"
