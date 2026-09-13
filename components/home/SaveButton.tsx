@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Icon from "@/components/ui/Icon";
+import { useTranslations } from "@/lib/i18n/client";
 
 interface SaveButtonProps {
   className?: string;
@@ -13,12 +14,13 @@ interface SaveButtonProps {
  * dentro de un `Link` de tarjeta.
  */
 export default function SaveButton({ className }: SaveButtonProps) {
+  const { t } = useTranslations();
   const [saved, setSaved] = useState(false);
 
   return (
     <button
       type="button"
-      aria-label="Save property"
+      aria-label={saved ? t("saveButton.unsave") : t("saveButton.save")}
       aria-pressed={saved}
       onClick={(e) => {
         e.preventDefault();

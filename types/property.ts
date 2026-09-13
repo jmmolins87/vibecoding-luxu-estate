@@ -44,8 +44,18 @@ export interface Property {
   featured?: boolean;
 }
 
-export function formatPrice(property: Pick<Property, "price" | "priceSuffix">): string {
-  const formatted = new Intl.NumberFormat("en-US", {
+const localeMap: Record<string, string> = {
+  en: "en-US",
+  es: "es-ES",
+  fr: "fr-FR",
+};
+
+export function formatPrice(
+  property: Pick<Property, "price" | "priceSuffix">,
+  locale = "en",
+): string {
+  const intlLocale = localeMap[locale] ?? "en-US";
+  const formatted = new Intl.NumberFormat(intlLocale, {
     style: "currency",
     currency: "USD",
     maximumFractionDigits: 0,

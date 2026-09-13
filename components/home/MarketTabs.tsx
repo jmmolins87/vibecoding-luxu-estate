@@ -4,12 +4,7 @@ import Link from "next/link";
 import type { PropertyStatusFilter } from "@/lib/properties";
 import type { PropertyFilters } from "@/lib/filters";
 import { buildSearchParams } from "@/lib/filters";
-
-const tabs: { value: PropertyStatusFilter; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "sale", label: "Buy" },
-  { value: "rent", label: "Rent" },
-];
+import { useTranslations } from "@/lib/i18n/client";
 
 function tabHref(
   status: PropertyStatusFilter,
@@ -26,20 +21,26 @@ export default function MarketTabs({
   active: PropertyStatusFilter;
   filters: PropertyFilters;
 }) {
+  const { t } = useTranslations();
+  const tabs: { value: PropertyStatusFilter; label: string }[] = [
+    { value: "all", label: t("market.tabs.all") },
+    { value: "sale", label: t("market.tabs.buy") },
+    { value: "rent", label: t("market.tabs.rent") },
+  ];
   return (
     <div className="hidden rounded-lg bg-white p-1 md:flex dark:bg-white/5">
-      {tabs.map((t) => (
+      {tabs.map((tab) => (
         <Link
-          key={t.value}
-          href={tabHref(t.value, filters)}
-          aria-current={active === t.value ? "true" : undefined}
+          key={tab.value}
+          href={tabHref(tab.value, filters)}
+          aria-current={active === tab.value ? "true" : undefined}
           className={
-            active === t.value
+            active === tab.value
               ? "rounded-md bg-nordic px-4 py-1.5 text-sm font-medium text-white shadow-sm"
               : "rounded-md px-4 py-1.5 text-sm font-medium text-nordic-muted hover:text-nordic dark:hover:text-white"
           }
         >
-          {t.label}
+          {tab.label}
         </Link>
       ))}
     </div>

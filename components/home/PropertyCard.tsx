@@ -1,13 +1,18 @@
+"use client";
+
 import Link from "next/link";
 import Icon from "@/components/ui/Icon";
 import SaveButton from "@/components/home/SaveButton";
 import { formatPrice, type Property } from "@/types/property";
+import { useTranslations, useLocale } from "@/lib/i18n/client";
 
 interface PropertyCardProps {
   property: Property;
 }
 
 export default function PropertyCard({ property }: PropertyCardProps) {
+  const { t } = useTranslations();
+  const locale = useLocale();
   const isRent = property.status === "rent";
 
   return (
@@ -29,14 +34,14 @@ export default function PropertyCard({ property }: PropertyCardProps) {
               : "absolute bottom-3 left-3 rounded bg-nordic/90 px-2 py-1 text-xs font-bold text-white"
           }
         >
-          {isRent ? "FOR RENT" : "FOR SALE"}
+          {isRent ? t("propertyCard.forRent") : t("propertyCard.forSale")}
         </div>
       </div>
 
       <div className="flex flex-grow flex-col p-4">
         <div className="mb-2 flex items-baseline justify-between">
           <h3 className="text-lg font-bold text-nordic dark:text-white">
-            {formatPrice(property)}
+            {formatPrice(property, locale)}
             {property.priceSuffix && (
               <span className="text-sm font-normal text-nordic-muted">
                 {property.priceSuffix}

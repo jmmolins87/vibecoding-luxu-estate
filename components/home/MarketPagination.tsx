@@ -1,7 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import type { PropertyStatusFilter } from "@/lib/properties";
 import type { PropertyFilters } from "@/lib/filters";
 import { buildSearchParams } from "@/lib/filters";
+import { useTranslations } from "@/lib/i18n/client";
 
 interface MarketPaginationProps {
   page: number;
@@ -35,6 +38,7 @@ export default function MarketPagination({
   status,
   filters,
 }: MarketPaginationProps) {
+  const { t } = useTranslations();
   if (totalPages <= 1) return null;
 
   const linkBase =
@@ -46,7 +50,7 @@ export default function MarketPagination({
 
   return (
     <nav
-      aria-label="Paginación de propiedades"
+      aria-label={t("pagination.ariaLabel")}
       className="mt-10 flex flex-col items-center gap-3"
     >
       <div className="flex flex-wrap items-center justify-center gap-2">
@@ -55,11 +59,11 @@ export default function MarketPagination({
             href={pageHref(page - 1, status, filters)}
             className={`${linkBase} ${linkIdle}`}
           >
-            ← Anterior
+            ← {t("pagination.previous")}
           </Link>
         ) : (
           <span className={`${linkBase} ${linkIdle} ${linkDisabled}`}>
-            ← Anterior
+            ← {t("pagination.previous")}
           </span>
         )}
 
@@ -79,17 +83,16 @@ export default function MarketPagination({
             href={pageHref(page + 1, status, filters)}
             className={`${linkBase} ${linkIdle}`}
           >
-            Siguiente →
+            {t("pagination.next")} →
           </Link>
         ) : (
           <span className={`${linkBase} ${linkIdle} ${linkDisabled}`}>
-            Siguiente →
+            {t("pagination.next")} →
           </span>
         )}
       </div>
       <p className="text-xs text-nordic-muted">
-        Página {page} de {totalPages} · {total}{" "}
-        {total === 1 ? "propiedad" : "propiedades"}
+        {t("pagination.pageInfo", { page, totalPages, total })}
       </p>
     </nav>
   );

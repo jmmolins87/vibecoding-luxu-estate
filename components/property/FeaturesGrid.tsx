@@ -1,5 +1,8 @@
+"use client";
+
 import Icon from "@/components/ui/Icon";
 import type { Property } from "@/types/property";
+import { useTranslations } from "@/lib/i18n/client";
 
 interface FeaturesGridProps {
   property: Pick<Property, "area" | "beds" | "baths" | "garage">;
@@ -7,17 +10,18 @@ interface FeaturesGridProps {
 
 /** Server Component: grid de características (m², habs, baños, garage). */
 export default function FeaturesGrid({ property }: FeaturesGridProps) {
+  const { t } = useTranslations();
   const features = [
-    { icon: "area" as const, value: String(property.area), label: "Square Meters" },
-    { icon: "bed" as const, value: String(property.beds), label: "Bedrooms" },
-    { icon: "bath" as const, value: String(property.baths), label: "Bathrooms" },
-    { icon: "garage" as const, value: String(property.garage), label: "Garage" },
+    { icon: "area" as const, value: String(property.area), label: t("property.squareMeters") },
+    { icon: "bed" as const, value: String(property.beds), label: t("property.bedrooms") },
+    { icon: "bath" as const, value: String(property.baths), label: t("property.bathrooms") },
+    { icon: "garage" as const, value: String(property.garage), label: t("property.garage") },
   ];
 
   return (
     <section className="rounded-xl border border-mosque/5 bg-white p-8 shadow-sm dark:bg-white/5">
       <h2 className="mb-6 text-lg font-semibold text-nordic dark:text-white">
-        Property Features
+        {t("property.features")}
       </h2>
       <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
         {features.map((f) => (

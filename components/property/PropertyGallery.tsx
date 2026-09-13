@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Icon from "@/components/ui/Icon";
 import type { Property } from "@/types/property";
+import { useTranslations } from "@/lib/i18n/client";
 
 interface PropertyGalleryProps {
   property: Pick<Property, "images" | "imagesAlt" | "title" | "status" | "tag">;
@@ -14,6 +15,7 @@ interface PropertyGalleryProps {
  * La imagen principal lleva `priority` (es el LCP de la página).
  */
 export default function PropertyGallery({ property }: PropertyGalleryProps) {
+  const { t } = useTranslations();
   const [active, setActive] = useState(0);
   const [lightbox, setLightbox] = useState(false);
 
@@ -36,11 +38,11 @@ export default function PropertyGallery({ property }: PropertyGalleryProps) {
         <div className="absolute top-4 left-4 flex gap-2">
           {property.tag && (
             <span className="rounded-full bg-mosque px-3 py-1.5 text-xs font-medium tracking-wider text-white uppercase shadow-sm">
-              {property.tag}
+              {property.tag ? (t(`tag.${property.tag}` as string) !== `tag.${property.tag}` ? t(`tag.${property.tag}` as string) : property.tag) : null}
             </span>
           )}
           <span className="rounded-full bg-white/90 px-3 py-1.5 text-xs font-medium tracking-wider text-nordic uppercase shadow-sm backdrop-blur">
-            {property.status === "sale" ? "For Sale" : "For Rent"}
+            {property.status === "sale" ? t("propertyCard.forSale") : t("propertyCard.forRent")}
           </span>
         </div>
         <button
@@ -48,7 +50,7 @@ export default function PropertyGallery({ property }: PropertyGalleryProps) {
           className="absolute right-4 bottom-4 flex items-center gap-2 rounded-lg bg-white/90 px-4 py-2 text-sm font-medium text-nordic shadow-lg backdrop-blur transition-all hover:bg-white"
         >
           <Icon name="grid" className="h-4 w-4" />
-          View All Photos
+          {t("gallery.viewAllPhotos")}
         </button>
       </div>
 
@@ -58,7 +60,7 @@ export default function PropertyGallery({ property }: PropertyGalleryProps) {
             <button
               key={src + i}
               onClick={() => setActive(i)}
-              aria-label={`View photo ${i + 1}`}
+              aria-label={t("gallery.viewPhoto", { index: i + 1 })}
               className={`relative aspect-[4/3] w-48 flex-none snap-start overflow-hidden rounded-lg transition-opacity ${
                 i === active
                   ? "ring-2 ring-mosque ring-offset-2 ring-offset-clearday dark:ring-offset-[#0f231f]"
@@ -86,7 +88,7 @@ export default function PropertyGallery({ property }: PropertyGalleryProps) {
           onClick={() => setLightbox(false)}
         >
           <button
-            aria-label="Close gallery"
+            aria-label={t("gallery.closeGallery")}
             onClick={() => setLightbox(false)}
             className="absolute top-4 right-4 rounded-full bg-white/10 p-3 text-white transition-colors hover:bg-white/20"
           >
@@ -95,7 +97,7 @@ export default function PropertyGallery({ property }: PropertyGalleryProps) {
             </svg>
           </button>
           <button
-            aria-label="Previous photo"
+            aria-label={t("gallery.previousPhoto")}
             onClick={(e) => {
               e.stopPropagation();
               prev();
@@ -119,7 +121,7 @@ export default function PropertyGallery({ property }: PropertyGalleryProps) {
             />
           </div>
           <button
-            aria-label="Next photo"
+            aria-label={t("gallery.nextPhoto")}
             onClick={(e) => {
               e.stopPropagation();
               next();

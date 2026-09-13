@@ -1,13 +1,18 @@
+"use client";
+
 import Link from "next/link";
 import Icon from "@/components/ui/Icon";
 import SaveButton from "@/components/home/SaveButton";
 import { formatPrice, type Property } from "@/types/property";
+import { useTranslations, useLocale } from "@/lib/i18n/client";
 
 interface FeaturedCardProps {
   property: Property;
 }
 
 export default function FeaturedCard({ property }: FeaturedCardProps) {
+  const { t } = useTranslations();
+  const locale = useLocale();
   return (
     <Link
       href={`/property/${property.slug}`}
@@ -21,7 +26,7 @@ export default function FeaturedCard({ property }: FeaturedCardProps) {
         />
         {property.tag && (
           <div className="absolute top-4 left-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold tracking-wider text-nordic uppercase backdrop-blur-sm dark:bg-black/80 dark:text-white">
-            {property.tag}
+            {t(`tag.${property.tag}` as string) !== `tag.${property.tag}` ? t(`tag.${property.tag}` as string) : property.tag}
           </div>
         )}
         <SaveButton className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-nordic backdrop-blur-sm transition-all hover:bg-mosque hover:text-white dark:bg-black/60 dark:text-white" />
@@ -41,15 +46,15 @@ export default function FeaturedCard({ property }: FeaturedCardProps) {
             </p>
           </div>
           <span className="text-xl font-semibold text-mosque">
-            {formatPrice(property)}
+            {formatPrice(property, locale)}
           </span>
         </div>
         <div className="mt-6 flex items-center gap-6 border-t border-nordic/5 pt-6 dark:border-white/10">
           <div className="flex items-center gap-2 text-sm text-nordic-muted">
-            <Icon name="bed" className="h-5 w-5" /> {property.beds} Beds
+            <Icon name="bed" className="h-5 w-5" /> {property.beds} {t("featured.beds")}
           </div>
           <div className="flex items-center gap-2 text-sm text-nordic-muted">
-            <Icon name="bath" className="h-5 w-5" /> {property.baths} Baths
+            <Icon name="bath" className="h-5 w-5" /> {property.baths} {t("featured.baths")}
           </div>
           <div className="flex items-center gap-2 text-sm text-nordic-muted">
             <Icon name="area" className="h-5 w-5" /> {property.area.toLocaleString()} m²

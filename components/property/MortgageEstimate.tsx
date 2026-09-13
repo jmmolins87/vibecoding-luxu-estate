@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Icon from "@/components/ui/Icon";
+import { useTranslations, useLocale } from "@/lib/i18n/client";
 
 interface MortgageEstimateProps {
   price: number;
@@ -9,12 +10,7 @@ interface MortgageEstimateProps {
   priceSuffix?: string;
 }
 
-const usd = (n: number) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(n);
+const localeMap: Record<string, string> = { en: "en-US", es: "es-ES", fr: "fr-FR" };
 
 /**
  * Client island: calculadora hipotecaria (enganche + tasa ajustables).
@@ -25,8 +21,18 @@ export default function MortgageEstimate({
   isRent,
   priceSuffix,
 }: MortgageEstimateProps) {
+  const { t } = useTranslations();
+  const locale = useLocale();
   const [downPct, setDownPct] = useState(20);
   const [rate, setRate] = useState(6.5);
+
+  const intlLocale = localeMap[locale] ?? "en-US";
+  const usd = (n: number) =>
+    new Intl.NumberFormat(intlLocale, {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 0,
+    }).format(n);
 
   const monthly = useMemo(() => {
     const principal = price * (1 - downPct / 100);
@@ -45,14 +51,14 @@ export default function MortgageEstimate({
           </div>
           <div>
             <h3 className="font-semibold text-nordic dark:text-white">
-              Monthly Rent
+              {t("property.monthlyRent")}
             </h3>
             <p className="text-sm text-nordic/60 dark:text-gray-300">
               <strong className="text-mosque">
                 {usd(price)}
                 {priceSuffix ?? "/mo"}
               </strong>{" "}
-              · deposit typically 1 month
+              · {t("property.deposit")}
             </p>
           </div>
         </div>
@@ -69,19 +75,18 @@ export default function MortgageEstimate({
           </div>
           <div>
             <h3 className="font-semibold text-nordic dark:text-white">
-              Estimated Payment
+              {t("property.estimatedPayment")}
             </h3>
             <p className="text-sm text-nordic/60 dark:text-gray-300">
-              Starting from{" "}
-              <strong className="text-mosque">{usd(monthly)}/mo</strong> with{" "}
-              {downPct}% down
+              {t("property.startingFrom")}{" "}
+              <strong className="text-mosque">{usd(monthly)}/mo</strong> {t("property.withDown", { percent: downPct })}
             </p>
           </div>
         </div>
       </div>
       <div className="mt-6 grid gap-4 rounded-lg bg-white p-4 sm:grid-cols-2 dark:bg-white/5">
         <label className="block text-sm font-medium text-nordic dark:text-gray-200">
-          Down payment: {downPct}% ({usd((price * downPct) / 100)})
+          {t("property.downPayment", { percent: downPct, amount: usd((price * downPct) / 100) })}
           <input
             type="range"
             min={0}
@@ -93,7 +98,7 @@ export default function MortgageEstimate({
           />
         </label>
         <label className="block text-sm font-medium text-nordic dark:text-gray-200">
-          Interest rate: {rate.toFixed(2)}%
+          {t("property.interestRate", { rate: rate.toFixed(2) })}
           <input
             type="range"
             min={3}

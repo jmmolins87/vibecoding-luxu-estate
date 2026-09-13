@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Icon from "@/components/ui/Icon";
 import { formatPrice, type Property } from "@/types/property";
+import { useTranslations, useLocale } from "@/lib/i18n/client";
 
 interface AgentCardProps {
   property: Property;
@@ -11,19 +14,21 @@ interface AgentCardProps {
  * Los CTAs enlazan a WhatsApp (`wa.me`) y `tel:` — cero JS, cero widgets.
  */
 export default function AgentCard({ property }: AgentCardProps) {
+  const { t } = useTranslations();
+  const locale = useLocale();
   const { agent } = property;
   const visitText = encodeURIComponent(
-    `Hi ${agent.name}, I'd like to schedule a visit to "${property.title}" (${property.address}).`,
+    t("property.scheduleMessage", { name: agent.name, title: property.title, address: property.address }),
   );
   const contactText = encodeURIComponent(
-    `Hi ${agent.name}, I'm interested in "${property.title}" (${property.address}). Could you share more details?`,
+    t("property.contactMessage", { name: agent.name, title: property.title, address: property.address }),
   );
 
   return (
     <div className="rounded-xl border border-mosque/5 bg-white p-6 shadow-sm dark:bg-white/5">
       <div className="mb-4">
         <h1 className="mb-2 text-4xl font-light text-nordic dark:text-white">
-          {formatPrice(property)}
+          {formatPrice(property, locale)}
           {property.priceSuffix && (
             <span className="text-lg font-normal text-nordic-muted">
               {property.priceSuffix}
@@ -66,7 +71,7 @@ export default function AgentCard({ property }: AgentCardProps) {
             href={agent.whatsapp}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`Chat with ${agent.name} on WhatsApp`}
+            aria-label={t("property.chatWith", { name: agent.name })}
             className="rounded-full bg-mosque/10 p-2 text-mosque transition-colors hover:bg-mosque hover:text-white"
           >
             <Icon name="chat" className="h-4 w-4" />
@@ -74,7 +79,7 @@ export default function AgentCard({ property }: AgentCardProps) {
           {agent.phone && (
             <a
               href={`tel:${agent.phone}`}
-              aria-label={`Call ${agent.name}`}
+              aria-label={t("property.call", { name: agent.name })}
               className="rounded-full bg-mosque/10 p-2 text-mosque transition-colors hover:bg-mosque hover:text-white"
             >
               <Icon name="call" className="h-4 w-4" />
@@ -94,7 +99,7 @@ export default function AgentCard({ property }: AgentCardProps) {
             name="calendar"
             className="h-5 w-5 transition-transform group-hover:scale-110"
           />
-          Schedule Visit
+          {t("property.scheduleVisit")}
         </a>
         <a
           href={`${agent.whatsapp}?text=${contactText}`}
@@ -103,7 +108,7 @@ export default function AgentCard({ property }: AgentCardProps) {
           className="flex w-full items-center justify-center gap-2 rounded-lg border border-nordic/10 bg-transparent px-6 py-4 font-medium text-nordic/80 transition-all hover:border-mosque hover:text-mosque dark:text-gray-200"
         >
           <Icon name="mail" className="h-5 w-5" />
-          Contact Agent
+          {t("property.contactAgent")}
         </a>
       </div>
     </div>

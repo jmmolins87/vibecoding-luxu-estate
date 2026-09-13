@@ -1,0 +1,162 @@
+{
+  "common": {
+    "search": "Search",
+    "close": "Close",
+    "clearAll": "Clear all",
+    "show": "Show",
+    "any": "Any",
+    "from": "From",
+    "upTo": "Up to",
+    "priceAny": "Any price",
+    "noMin": "No min",
+    "noMax": "No max"
+  },
+  "nav": {
+    "buy": "Buy",
+    "rent": "Rent",
+    "sell": "Sell",
+    "savedHomes": "Saved Homes",
+    "search": "Search",
+    "notifications": "Notifications",
+    "menu": "Menu",
+    "profile": "Profile",
+    "homeAriaLabel": "LuxeEstate home"
+  },
+  "hero": {
+    "findYour": "Find your",
+    "sanctuary": "sanctuary",
+    "searchPlaceholder": "Search by city, neighborhood, or address...",
+    "search": "Search",
+    "filters": "Filters",
+    "all": "All"
+  },
+  "market": {
+    "title": "New in Market",
+    "subtitle": "Fresh opportunities added this week.",
+    "noResults": "No properties match these filters.",
+    "clearFilters": "Clear all filters",
+    "tabs": {
+      "all": "All",
+      "buy": "Buy",
+      "rent": "Rent"
+    }
+  },
+  "propertyCard": {
+    "forSale": "FOR SALE",
+    "forRent": "FOR RENT",
+    "beds": "Beds",
+    "baths": "Baths"
+  },
+  "featured": {
+    "title": "Featured Collections",
+    "subtitle": "Curated properties for the discerning eye.",
+    "viewAll": "View all",
+    "beds": "Beds",
+    "baths": "Baths"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "pageInfo": "Page {page} of {totalPages} · {total} {total, plural, one {property} other {properties}}",
+    "ariaLabel": "Property pagination"
+  },
+  "gallery": {
+    "viewAllPhotos": "View All Photos",
+    "viewPhoto": "View photo {index}",
+    "closeGallery": "Close gallery",
+    "previousPhoto": "Previous photo",
+    "nextPhoto": "Next photo"
+  },
+  "notFound": {
+    "description": "This listing is no longer available or the link is incorrect. Explore other homes on the market.",
+    "backToHome": "Back to home"
+  },
+  "saveButton": {
+    "save": "Save property",
+    "unsave": "Unsave property"
+  },
+  "filters": {
+    "title": "Filters",
+    "closeAriaLabel": "Close filters",
+    "location": "Location",
+    "locationPlaceholder": "City, neighborhood, or address",
+    "priceRange": "Price Range",
+    "minPrice": "Min Price",
+    "maxPrice": "Max Price",
+    "propertyType": "Property Type",
+    "anyType": "Any Type",
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "amenities": "Amenities & Features",
+    "clearAllFilters": "Clear all filters",
+    "showHomes": "Show {count} {count, plural, one {Home} other {Homes}}",
+    "fewerBedrooms": "Fewer Bedrooms",
+    "moreBedrooms": "More Bedrooms",
+    "fewerBathrooms": "Fewer Bathrooms",
+    "moreBathrooms": "More Bathrooms",
+    "minimumPrice": "Minimum price",
+    "maximumPrice": "Maximum price",
+    "searchFilters": "Search filters"
+  },
+  "filterChips": {
+    "beds": "{count}+ beds",
+    "baths": "{count}+ baths"
+  },
+  "property": {
+    "features": "Property Features",
+    "squareMeters": "Square Meters",
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "garage": "Garage",
+    "about": "About this home",
+    "readMore": "Read more",
+    "showLess": "Show less",
+    "amenities": "Amenities",
+    "scheduleVisit": "Schedule Visit",
+    "contactAgent": "Contact Agent",
+    "viewOnMap": "View on Map",
+    "monthlyRent": "Monthly Rent",
+    "deposit": "deposit typically 1 month",
+    "estimatedPayment": "Estimated Payment",
+    "startingFrom": "Starting from",
+    "withDown": "with {percent}% down",
+    "downPayment": "Down payment: {percent}% ({amount})",
+    "interestRate": "Interest rate: {rate}%",
+    "forSale": "for sale",
+    "forRent": "for rent",
+    "notFound": "Property not found",
+    "chatWith": "Chat with {name} on WhatsApp",
+    "call": "Call {name}",
+    "scheduleMessage": "Hi {name}, I'd like to schedule a visit to \"{title}\" ({address}).",
+    "contactMessage": "Hi {name}, I'm interested in \"{title}\" ({address}). Could you share more details?"
+  },
+  "footer": {
+    "rights": "© {year} LuxeEstate Inc. All rights reserved."
+  },
+  "propertyType": {
+    "House": "House",
+    "Apartment": "Apartment",
+    "Villa": "Villa",
+    "Penthouse": "Penthouse"
+  },
+  "amenity": {
+    "Swimming Pool": "Swimming Pool",
+    "Gym": "Gym",
+    "Parking": "Parking",
+    "Air Conditioning": "Air Conditioning",
+    "High-speed Wifi": "High-speed Wifi",
+    "Patio / Terrace": "Patio / Terrace"
+  },
+  "tag": {
+    "Exclusive": "Exclusive",
+    "New Arrival": "New Arrival",
+    "Premium": "Premium",
+    "New": "New"
+  },
+  "language": {
+    "selector": "Language",
+    "english": "English",
+    "spanish": "Español",
+    "french": "Français"
+  }
+}

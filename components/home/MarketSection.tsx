@@ -4,6 +4,7 @@ import MarketTabs from "@/components/home/MarketTabs";
 import MarketPagination from "@/components/home/MarketPagination";
 import type { PaginatedProperties } from "@/lib/properties";
 import type { PropertyFilters } from "@/lib/filters";
+import { getTranslations } from "@/lib/i18n/server";
 
 /**
  * Sección "New in Market" renderizada en el SERVIDOR.
@@ -11,22 +12,23 @@ import type { PropertyFilters } from "@/lib/filters";
  * la navegación entre páginas y filtros usa Links con searchParams,
  * así que cada cambio lo resuelve el Server Component de la página.
  */
-export default function MarketSection({
+export default async function MarketSection({
   data,
   filters,
 }: {
   data: PaginatedProperties;
   filters: PropertyFilters;
 }) {
+  const { t } = await getTranslations();
   return (
     <section id="market" className="scroll-mt-24">
       <div className="mb-8 flex items-end justify-between">
         <div>
           <h2 className="text-2xl font-light text-nordic dark:text-white">
-            New in Market
+            {t("market.title")}
           </h2>
           <p className="mt-1 text-sm text-nordic-muted">
-            Fresh opportunities added this week.
+            {t("market.subtitle")}
           </p>
         </div>
         <MarketTabs active={data.status} filters={filters} />
@@ -35,13 +37,13 @@ export default function MarketSection({
       {data.properties.length === 0 ? (
         <div className="rounded-xl bg-white p-8 text-center dark:bg-white/5">
           <p className="text-sm font-medium text-nordic dark:text-white">
-            No properties match these filters.
+            {t("market.noResults")}
           </p>
           <Link
             href="/#market"
             className="mt-2 inline-block text-sm font-semibold text-mosque hover:underline"
           >
-            Clear all filters
+            {t("market.clearFilters")}
           </Link>
         </div>
       ) : (

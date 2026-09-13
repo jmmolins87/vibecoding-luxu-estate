@@ -11,6 +11,8 @@ import PropertyMapWrapper from "@/components/property/PropertyMapWrapper";
 import Icon from "@/components/ui/Icon";
 import { getAllPropertySlugs, getPropertyBySlug } from "@/lib/properties";
 import { formatPrice } from "@/types/property";
+import { getLocale } from "@/lib/i18n/server";
+import { getDictionary, createTranslator } from "@/lib/i18n/dictionaries";
 
 /** ISR: las fichas se regeneran cada 60 s (best-practices §1). */
 export const revalidate = 60;
@@ -33,14 +35,15 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const property = await getPropertyBySlug(slug);
+  const [property, locale] = await Promise.all([getPropertyBySlug(slug), getLocale()]);
+  const t = createTranslator(getDictionary(locale));
 
   // Metatags genéricos si el slug no existe — nunca vacíos (§4.1).
-  if (!property) return { title: "Property not found | LuxeEstate" };
+  if (!property) return { title: `${t("property.notFound")} | LuxeEstate` };
 
-  const title = `${property.title} — ${formatPrice(property)}`;
+  const title = `${property.title} — ${formatPrice(property, locale)}`;
   const description =
-    `${property.type} for ${property.status === "sale" ? "sale" : "rent"} in ${property.location}: ` +
+    `${property.type} ${property.status === "sale" ? t("property.forSale") : t("property.forRent")} in ${property.location}: ` +
     `${property.beds} beds, ${property.baths} baths, ${property.area} m².`;
 
   return {
@@ -80,7 +83,9 @@ export default async function PropertyPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const property = await getPropertyBySlug(slug);
+  const [property, locale] = await Promise.all([getPropertyBySlug(slug), getLocale()]);
+  const dict = getDictionary(locale);
+  const t = createTranslator(dict);
 
   if (!property) notFound();
 
@@ -138,7 +143,7 @@ export default async function PropertyPage({
                   className="mt-2 flex items-center justify-end gap-1 px-2 pb-1 text-xs font-medium text-nordic/60 hover:text-mosque"
                 >
                   <Icon name="place" className="h-3.5 w-3.5" />
-                  View on Map
+                  {t("property.viewOnMap")}
                 </a>
               </div>
             </div>
@@ -161,7 +166,7 @@ export default async function PropertyPage({
       <footer className="mt-12 border-t border-slate-200 bg-white py-12 dark:border-white/10 dark:bg-white/5">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 sm:px-6 md:flex-row lg:px-8">
           <div className="text-sm text-nordic/50 dark:text-gray-400">
-            © 2026 LuxeEstate Inc. All rights reserved.
+            {t("footer.rights", { year: 2026 })}
           </div>
         </div>
       </footer>

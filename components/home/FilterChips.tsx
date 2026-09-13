@@ -7,6 +7,7 @@ import {
   formatPriceShort,
   type PropertyFilters,
 } from "@/lib/filters";
+import { useTranslations } from "@/lib/i18n/client";
 
 interface Chip {
   key: string;
@@ -16,6 +17,7 @@ interface Chip {
 
 /** Chips de filtros activos bajo el hero — cada ✕ quita ese filtro. */
 export default function FilterChips({ filters }: { filters: PropertyFilters }) {
+  const { t } = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -28,8 +30,8 @@ export default function FilterChips({ filters }: { filters: PropertyFilters }) {
         filters.minPrice !== undefined && filters.maxPrice !== undefined
           ? `${formatPriceShort(filters.minPrice)} – ${formatPriceShort(filters.maxPrice)}`
           : filters.minPrice !== undefined
-            ? `From ${formatPriceShort(filters.minPrice)}`
-            : `Up to ${formatPriceShort(filters.maxPrice ?? 0)}`,
+            ? `${t("common.from")} ${formatPriceShort(filters.minPrice)}`
+            : `${t("common.upTo")} ${formatPriceShort(filters.maxPrice ?? 0)}`,
       remove: { minPrice: undefined, maxPrice: undefined },
     });
 
@@ -51,7 +53,7 @@ export default function FilterChips({ filters }: { filters: PropertyFilters }) {
         if (typeof value === "number")
           chips.push({
             key: "beds",
-            label: `${value}+ beds`,
+            label: t("filterChips.beds", { count: value as number }),
             remove: { beds: undefined },
           });
         break;
@@ -59,7 +61,7 @@ export default function FilterChips({ filters }: { filters: PropertyFilters }) {
         if (typeof value === "number")
           chips.push({
             key: "baths",
-            label: `${value}+ baths`,
+            label: t("filterChips.baths", { count: value as number }),
             remove: { baths: undefined },
           });
         break;
@@ -67,20 +69,22 @@ export default function FilterChips({ filters }: { filters: PropertyFilters }) {
         if (typeof value === "string" && value !== "")
           chips.push({
             key: "type",
-            label: value,
+            label: t(`propertyType.${value}` as string) !== `propertyType.${value}` ? t(`propertyType.${value}` as string) : String(value),
             remove: { type: undefined },
           });
         break;
       case "amenities":
         if (Array.isArray(value))
-          for (const a of value)
+          for (const a of value) {
+            const translated = t(`amenity.${String(a)}` as string);
             chips.push({
               key: `amenity-${String(a)}`,
-              label: String(a),
+              label: translated !== `amenity.${String(a)}` ? translated : String(a),
               remove: {
                 amenities: (filters.amenities ?? []).filter((x) => x !== a),
               },
             });
+          }
         break;
       case "status":
       case "minPrice":

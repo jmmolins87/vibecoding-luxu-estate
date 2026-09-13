@@ -11,6 +11,7 @@ import {
   parseFilters,
   type PropertyFilters,
 } from "@/lib/filters";
+import { useTranslations } from "@/lib/i18n/client";
 
 interface FilterModalProps {
   open: boolean;
@@ -33,6 +34,7 @@ function paramsRecord(sp: URLSearchParams): Record<string, string> {
  * `router.push` y la página se re-renderiza en el servidor.
  */
 export default function FilterModal({ open, onClose, total }: FilterModalProps) {
+  const { t } = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [draft, setDraft] = useState<PropertyFilters>({});
@@ -102,10 +104,10 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
     draft.minPrice !== undefined && draft.maxPrice !== undefined
       ? `${formatPriceShort(draft.minPrice)} – ${formatPriceShort(draft.maxPrice)}`
       : draft.minPrice !== undefined
-        ? `From ${formatPriceShort(draft.minPrice)}`
+        ? `${t("common.from")} ${formatPriceShort(draft.minPrice)}`
         : draft.maxPrice !== undefined
-          ? `Up to ${formatPriceShort(draft.maxPrice)}`
-          : "Any price";
+          ? `${t("common.upTo")} ${formatPriceShort(draft.maxPrice)}`
+          : t("common.priceAny");
 
   const minPct =
     draft.minPrice !== undefined
@@ -170,7 +172,7 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
-      aria-label="Search filters"
+      aria-label={t("filters.searchFilters")}
     >
       <div
         className="absolute inset-0 bg-nordic/40 backdrop-blur-sm"
@@ -180,11 +182,11 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
         {/* Header */}
         <header className="sticky top-0 z-30 flex items-center justify-between border-b border-nordic/5 bg-white px-8 py-6 dark:border-white/10 dark:bg-[#0f231f]">
           <h1 className="text-2xl font-semibold tracking-tight text-nordic dark:text-white">
-            Filters
+            {t("filters.title")}
           </h1>
           <button
             onClick={onClose}
-            aria-label="Close filters"
+            aria-label={t("filters.closeAriaLabel")}
             className="rounded-full p-2 text-nordic-muted transition-colors hover:bg-black/5 dark:hover:bg-white/10"
           >
             <Icon name="close" className="h-5 w-5" />
@@ -199,7 +201,7 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
               htmlFor="filter-city"
               className="mb-3 block text-xs font-semibold tracking-wider text-nordic-muted uppercase"
             >
-              Location
+              {t("filters.location")}
             </label>
             <div className="group relative">
               <Icon
@@ -209,7 +211,7 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
               <input
                 id="filter-city"
                 type="text"
-                placeholder="City, neighborhood, or address"
+                placeholder={t("filters.locationPlaceholder")}
                 value={draft.city ?? ""}
                 onChange={(e) => update({ city: e.target.value || undefined }, false)}
                 className="w-full rounded-lg border-0 bg-clearday py-3 pr-4 pl-12 text-nordic shadow-sm transition-all placeholder:text-nordic-muted/60 focus:bg-white focus:ring-2 focus:ring-mosque dark:bg-white/5 dark:text-white dark:focus:bg-white/10"
@@ -221,14 +223,14 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
           <section>
             <div className="mb-4 flex items-end justify-between">
               <label className="block text-xs font-semibold tracking-wider text-nordic-muted uppercase">
-                Price Range
+                {t("filters.priceRange")}
               </label>
               <span className="text-sm font-medium text-mosque">{rangeLabel}</span>
             </div>
             <div
               ref={trackRef}
               role="group"
-              aria-label="Price range"
+              aria-label={t("filters.priceRange")}
               onPointerDown={trackPointerDown}
               onPointerMove={trackPointerMove}
               onPointerUp={trackPointerUp}
@@ -244,8 +246,8 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
                   }}
                 />
               </div>
-              <RangeThumb ariaLabel="Minimum price" valuePct={minPct} />
-              <RangeThumb ariaLabel="Maximum price" valuePct={maxPct} />
+              <RangeThumb ariaLabel={t("filters.minimumPrice")} valuePct={minPct} />
+              <RangeThumb ariaLabel={t("filters.maximumPrice")} valuePct={maxPct} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="rounded-lg bg-clearday p-3 transition-colors focus-within:border-mosque/30 dark:bg-white/5">
@@ -253,7 +255,7 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
                   htmlFor="filter-min"
                   className="mb-1 block text-[10px] font-medium text-nordic-muted uppercase"
                 >
-                  Min Price
+                  {t("filters.minPrice")}
                 </label>
                 <div className="flex items-center">
                   <span className="mr-1 text-nordic-muted/60">$</span>
@@ -261,7 +263,7 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
                     id="filter-min"
                     type="text"
                     inputMode="numeric"
-                    placeholder="No min"
+                    placeholder={t("common.noMin")}
                     value={
                       draft.minPrice !== undefined
                         ? draft.minPrice.toLocaleString("en-US")
@@ -279,7 +281,7 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
                   htmlFor="filter-max"
                   className="mb-1 block text-[10px] font-medium text-nordic-muted uppercase"
                 >
-                  Max Price
+                  {t("filters.maxPrice")}
                 </label>
                 <div className="flex items-center">
                   <span className="mr-1 text-nordic-muted/60">$</span>
@@ -287,7 +289,7 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
                     id="filter-max"
                     type="text"
                     inputMode="numeric"
-                    placeholder="No max"
+                    placeholder={t("common.noMax")}
                     value={
                       draft.maxPrice !== undefined
                         ? draft.maxPrice.toLocaleString("en-US")
@@ -310,7 +312,7 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
                 htmlFor="filter-type"
                 className="block text-xs font-semibold tracking-wider text-nordic-muted uppercase"
               >
-                Property Type
+                {t("filters.propertyType")}
               </label>
               <div className="relative">
                 <select
@@ -325,10 +327,10 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
                   }
                   className="w-full cursor-pointer appearance-none rounded-lg border-0 bg-clearday py-3 pr-10 pl-4 text-nordic focus:ring-2 focus:ring-mosque dark:bg-white/5 dark:text-white"
                 >
-                  <option value="">Any Type</option>
-                  {PROPERTY_TYPES.map((t) => (
-                    <option key={t} value={t}>
-                      {t}
+                  <option value="">{t("filters.anyType")}</option>
+                  {PROPERTY_TYPES.map((pt) => (
+                    <option key={pt} value={pt}>
+                      {t(`propertyType.${pt}`)}
                     </option>
                   ))}
                 </select>
@@ -341,18 +343,22 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
 
             <div className="space-y-4">
               <Stepper
-                label="Bedrooms"
+                label={t("filters.bedrooms")}
                 value={draft.beds ?? 0}
                 onChange={(v) =>
                   update({ beds: v === 0 ? undefined : v })
                 }
+                t={t}
+                type="beds"
               />
               <Stepper
-                label="Bathrooms"
+                label={t("filters.bathrooms")}
                 value={draft.baths ?? 0}
                 onChange={(v) =>
                   update({ baths: v === 0 ? undefined : v })
                 }
+                t={t}
+                type="baths"
               />
             </div>
           </section>
@@ -360,7 +366,7 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
           {/* Amenities */}
           <section>
             <span className="mb-4 block text-xs font-semibold tracking-wider text-nordic-muted uppercase">
-              Amenities &amp; Features
+              {t("filters.amenities")}
             </span>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
               {AMENITY_OPTIONS.map((opt) => {
@@ -373,7 +379,7 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
                       checked={active}
                       onChange={() => toggleAmenity(opt.value)}
                     />
-                    <div
+                      <div
                       className={
                         active
                           ? "flex h-full items-center justify-center gap-2 rounded-lg border border-mosque bg-mosque/5 px-4 py-3 text-sm font-medium text-mosque transition-all hover:bg-mosque/10 dark:bg-mosque/20"
@@ -381,7 +387,7 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
                       }
                     >
                       <Icon name={opt.icon} className="h-5 w-5" />
-                      {opt.label}
+                      {t(`amenity.${opt.value}` as string) !== `amenity.${opt.value}` ? t(`amenity.${opt.value}` as string) : opt.label}
                     </div>
                     {active && (
                       <div className="absolute top-2 right-2 h-2 w-2 rounded-full bg-mosque" />
@@ -399,13 +405,13 @@ export default function FilterModal({ open, onClose, total }: FilterModalProps) 
             onClick={clearAll}
             className="text-sm font-medium text-nordic-muted underline decoration-nordic/20 underline-offset-4 transition-colors hover:text-nordic dark:hover:text-white"
           >
-            Clear all filters
+            {t("filters.clearAllFilters")}
           </button>
           <button
             onClick={onClose}
             className="flex transform items-center gap-2 rounded-lg bg-mosque px-8 py-3 font-medium text-white shadow-lg shadow-mosque/30 transition-all hover:bg-mosque/90 active:scale-95"
           >
-            Show {total} {total === 1 ? "Home" : "Homes"}
+            {t("filters.showHomes", { count: total })}
             <Icon name="arrow" className="h-4 w-4" />
           </button>
         </footer>
@@ -439,11 +445,17 @@ function Stepper({
   label,
   value,
   onChange,
+  t,
+  type,
 }: {
   label: string;
   value: number;
   onChange: (v: number) => void;
+  t: (key: string, params?: Record<string, string | number>) => string;
+  type: "beds" | "baths";
 }) {
+  const fewerKey = type === "beds" ? "filters.fewerBedrooms" : "filters.fewerBathrooms";
+  const moreKey = type === "beds" ? "filters.moreBedrooms" : "filters.moreBathrooms";
   return (
     <div className="flex items-center justify-between">
       <span className="text-sm font-medium text-nordic dark:text-gray-100">
@@ -453,17 +465,17 @@ function Stepper({
         <button
           onClick={() => onChange(Math.max(0, value - 1))}
           disabled={value === 0}
-          aria-label={`Fewer ${label}`}
+          aria-label={t(fewerKey)}
           className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-nordic-muted shadow-sm transition-colors hover:text-mosque disabled:opacity-50 dark:bg-white/10"
         >
           <Icon name="minus" className="h-4 w-4" />
         </button>
         <span className="w-8 text-center text-sm font-semibold text-nordic dark:text-white">
-          {value === 0 ? "Any" : `${value}+`}
+          {value === 0 ? t("common.any") : `${value}+`}
         </span>
         <button
           onClick={() => onChange(Math.min(10, value + 1))}
-          aria-label={`More ${label}`}
+          aria-label={t(moreKey)}
           className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-mosque shadow-sm transition-colors hover:bg-mosque hover:text-white dark:bg-white/10"
         >
           <Icon name="plus" className="h-4 w-4" />

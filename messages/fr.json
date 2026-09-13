@@ -1,0 +1,162 @@
+{
+  "common": {
+    "search": "Rechercher",
+    "close": "Fermer",
+    "clearAll": "Tout effacer",
+    "show": "Afficher",
+    "any": "Tous",
+    "from": "À partir de",
+    "upTo": "Jusqu'à",
+    "priceAny": "Tous les prix",
+    "noMin": "Pas de min",
+    "noMax": "Pas de max"
+  },
+  "nav": {
+    "buy": "Acheter",
+    "rent": "Louer",
+    "sell": "Vendre",
+    "savedHomes": "Favoris",
+    "search": "Rechercher",
+    "notifications": "Notifications",
+    "menu": "Menu",
+    "profile": "Profil",
+    "homeAriaLabel": "Accueil LuxeEstate"
+  },
+  "hero": {
+    "findYour": "Trouvez votre",
+    "sanctuary": "sanctuaire",
+    "searchPlaceholder": "Rechercher par ville, quartier ou adresse...",
+    "search": "Rechercher",
+    "filters": "Filtres",
+    "all": "Tout"
+  },
+  "market": {
+    "title": "Nouveautés sur le marché",
+    "subtitle": "Nouvelles opportunités ajoutées cette semaine.",
+    "noResults": "Aucune propriété ne correspond à ces filtres.",
+    "clearFilters": "Effacer tous les filtres",
+    "tabs": {
+      "all": "Tout",
+      "buy": "Acheter",
+      "rent": "Louer"
+    }
+  },
+  "propertyCard": {
+    "forSale": "À VENDRE",
+    "forRent": "À LOUER",
+    "beds": "Ch.",
+    "baths": "Sdb"
+  },
+  "featured": {
+    "title": "Collections en vedette",
+    "subtitle": "Des biens sélectionnés pour les plus exigeants.",
+    "viewAll": "Voir tout",
+    "beds": "Ch.",
+    "baths": "Sdb"
+  },
+  "pagination": {
+    "previous": "Précédent",
+    "next": "Suivant",
+    "pageInfo": "Page {page} sur {totalPages} · {total} {total, plural, one {bien} other {biens}}",
+    "ariaLabel": "Pagination des biens"
+  },
+  "gallery": {
+    "viewAllPhotos": "Voir toutes les photos",
+    "viewPhoto": "Voir la photo {index}",
+    "closeGallery": "Fermer la galerie",
+    "previousPhoto": "Photo précédente",
+    "nextPhoto": "Photo suivante"
+  },
+  "notFound": {
+    "description": "Cette annonce n'est plus disponible ou le lien est incorrect. Explorez d'autres biens sur le marché.",
+    "backToHome": "Retour à l'accueil"
+  },
+  "saveButton": {
+    "save": "Enregistrer le bien",
+    "unsave": "Retirer des favoris"
+  },
+  "filters": {
+    "title": "Filtres",
+    "closeAriaLabel": "Fermer les filtres",
+    "location": "Emplacement",
+    "locationPlaceholder": "Ville, quartier ou adresse",
+    "priceRange": "Fourchette de prix",
+    "minPrice": "Prix min",
+    "maxPrice": "Prix max",
+    "propertyType": "Type de bien",
+    "anyType": "Tous les types",
+    "bedrooms": "Chambres",
+    "bathrooms": "Salles de bain",
+    "amenities": "Équipements et caractéristiques",
+    "clearAllFilters": "Effacer tous les filtres",
+    "showHomes": "Afficher {count} {count, plural, one {bien} other {biens}}",
+    "fewerBedrooms": "Moins de chambres",
+    "moreBedrooms": "Plus de chambres",
+    "fewerBathrooms": "Moins de salles de bain",
+    "moreBathrooms": "Plus de salles de bain",
+    "minimumPrice": "Prix minimum",
+    "maximumPrice": "Prix maximum",
+    "searchFilters": "Filtres de recherche"
+  },
+  "filterChips": {
+    "beds": "{count}+ ch.",
+    "baths": "{count}+ sdb"
+  },
+  "property": {
+    "features": "Caractéristiques du bien",
+    "squareMeters": "Mètres carrés",
+    "bedrooms": "Chambres",
+    "bathrooms": "Salles de bain",
+    "garage": "Garage",
+    "about": "À propos de ce bien",
+    "readMore": "Lire plus",
+    "showLess": "Voir moins",
+    "amenities": "Équipements",
+    "scheduleVisit": "Planifier une visite",
+    "contactAgent": "Contacter l'agent",
+    "viewOnMap": "Voir sur la carte",
+    "monthlyRent": "Loyer mensuel",
+    "deposit": "dépôt généralement 1 mois",
+    "estimatedPayment": "Paiement estimé",
+    "startingFrom": "À partir de",
+    "withDown": "avec {percent}% d'apport",
+    "downPayment": "Apport : {percent}% ({amount})",
+    "interestRate": "Taux d'intérêt : {rate}%",
+    "forSale": "à vendre",
+    "forRent": "à louer",
+    "notFound": "Bien non trouvé",
+    "chatWith": "Discuter avec {name} sur WhatsApp",
+    "call": "Appeler {name}",
+    "scheduleMessage": "Bonjour {name}, je souhaite planifier une visite pour \"{title}\" ({address}).",
+    "contactMessage": "Bonjour {name}, je suis intéressé par \"{title}\" ({address}). Pourriez-vous partager plus de détails ?"
+  },
+  "footer": {
+    "rights": "© {year} LuxeEstate Inc. Tous droits réservés."
+  },
+  "propertyType": {
+    "House": "Maison",
+    "Apartment": "Appartement",
+    "Villa": "Villa",
+    "Penthouse": "Penthouse"
+  },
+  "amenity": {
+    "Swimming Pool": "Piscine",
+    "Gym": "Salle de sport",
+    "Parking": "Parking",
+    "Air Conditioning": "Climatisation",
+    "High-speed Wifi": "Wifi haut débit",
+    "Patio / Terrace": "Patio / Terrasse"
+  },
+  "tag": {
+    "Exclusive": "Exclusif",
+    "New Arrival": "Nouveauté",
+    "Premium": "Premium",
+    "New": "Nouveau"
+  },
+  "language": {
+    "selector": "Langue",
+    "english": "Anglais",
+    "spanish": "Espagnol",
+    "french": "Français"
+  }
+}
